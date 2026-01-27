@@ -1,14 +1,23 @@
 import { tv } from "tailwind-variants";
 
 export const tabs = tv({
-  base: "flex items-center gap-8",
+  base: `
+    relative
+    flex items-center gap-8
+    after:absolute
+    after:left-0
+    after:right-0
+    after:-bottom-[6px]
+    after:h-[1px]
+    after:bg-white/30
+  `,
 });
 
 export const tabItem = tv({
   base: `
     relative
     text-[14px]
-    font-medium
+    font-normal
     text-white/70
     cursor-pointer
     transition-colors

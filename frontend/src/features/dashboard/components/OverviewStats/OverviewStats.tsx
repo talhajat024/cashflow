@@ -1,6 +1,8 @@
 import { StatCard } from "../StatCard";
 import { statsWrapper, statsGrid } from "./OverviewStats.styles";
-import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
+import { Wallet } from "lucide-react";
+import { CurrencyCircleDollar,Coins } from "phosphor-react";
+
 
 export function OverviewStats() {
   return (
@@ -19,7 +21,7 @@ export function OverviewStats() {
         title="Total Income"
         period="9 July - 24 September 2023"
         value="$854,348.00"
-        icon={<TrendingUp size={18} />}
+        icon={<CurrencyCircleDollar weight="fill" size={18} />}
         tone="green"
         trend={{ label: "+8.2%", positive: true }}
       />
@@ -28,7 +30,7 @@ export function OverviewStats() {
         title="Total Spending"
         period="24 July - 24 September 2023"
         value="$432,120.00"
-        icon={<TrendingDown size={18} />}
+        icon={<Coins size={18} />}
         tone="red"
         trend={{ label: "-4.1%", positive: false }}
       />

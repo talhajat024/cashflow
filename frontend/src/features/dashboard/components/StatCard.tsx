@@ -34,32 +34,40 @@ export function StatCard({
   tone,
   trend,
 }: StatCardProps) {
+
+  const RIGHT_COL_WIDTH = "w-[88px]";
   return (
     <div className={card()}>
-      <div className={header()}>
-        <div>
-          <h4 className={titleText()}>{title}</h4>
-          <p className={periodText()}>{period}</p>
-        </div>
+ <div className="grid grid-cols-[1fr_88px] gap-x-4">
+  {/* HEADER LEFT */}
+  <div>
+    <h3 className={titleText()}>{title}</h3>
+    <p className={periodText()}>{period}</p>
+  </div>
 
-        <div className={iconWrapper({ tone })}>{icon}</div>
-      </div>
+  {/* HEADER RIGHT (ICON) */}
+  <div className="flex justify-end">
+    <div className={iconWrapper({ tone })}>
+      {icon}
+    </div>
+  </div>
 
-      <div className={content()}>
-        <div>
-          <p className={valueText()}>{value}</p>
-          <p className={trendText({ positive: trend.positive })}>
-            {trend.label}
-          </p>
-        </div>
+  {/* CONTENT LEFT */}
+  <div className="mt-6">
+    <p className={valueText()}>{value}</p>
+    <p className={trendText({ positive: trend.positive })}>
+      {trend.label}
+    </p>
+  </div>
 
-        <div className={chartWrapper()}>
-          <MiniChart
-          data={[30, 45, 40, 60, 55, 70]}
-          positive={trend.positive}
-          />
-        </div>
-      </div>
+  {/* CONTENT RIGHT (CHART) */}
+  <div className="mt-6 flex justify-end items-end">
+    <MiniChart
+      data={[30, 45, 70]}
+      positive={trend.positive}
+    />
+  </div>
+</div>
     </div>
   );
 }
