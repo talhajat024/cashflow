@@ -4,6 +4,6 @@ namespace CashFlow.Api.Application.Interfaces;
 
 public interface ITransactionService
 {
-    IEnumerable<Transaction> GetRecent(Guid userId,int count);
-
+    Task<IReadOnlyList<Transaction>> GetAllAsync(Guid userId);
+    Task<IReadOnlyList<Transaction>> GetRecentAsync(Guid userId,int count);
 }

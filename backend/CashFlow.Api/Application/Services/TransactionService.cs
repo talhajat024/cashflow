@@ -12,8 +12,12 @@ public class TransactionService:ITransactionService
         _repository=repository;
     }
 
-    public IEnumerable<Transaction> GetRecent(Guid userId,int count)
+    public async Task<IReadOnlyList<Transaction>> GetAllAsync(Guid userId)
     {
-        return _repository.GetRecent(userId, count);
+        return await _repository.GetByUserAsync(userId);
+    }
+    public async Task<IReadOnlyList<Transaction>> GetRecentAsync(Guid userId,int count)
+    {
+        return await _repository.GetRecentAsync(userId,count);
     }
 }

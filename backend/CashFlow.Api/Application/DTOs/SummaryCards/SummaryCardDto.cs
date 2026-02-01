@@ -11,6 +11,5 @@ public class SummaryCardDto
     public string ComparisonLabel {get;set;}= string.Empty;
     public string DateRange {get;set;} = string.Empty;
     public string Currency { get; set; } = "USD";
-    public string Type { get; set; } = string.Empty;
     public bool IsPositiveTrend => PercentageChange >=0;
 }

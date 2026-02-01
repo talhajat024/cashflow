@@ -1,7 +1,8 @@
-using CashFlow.Api.Domain.Models;
+using CashFlow.Api.Application.DTOs;
+using CashFlow.Api.Domain.Enums;
 namespace CashFlow.Api.Application.Interfaces;
 
 public interface IDashboardService
 {
-    DashboardOverview GetOverview(Guid userId);
+    Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,TimeRange spendingRange,int balanceRangeInMonths);
 }

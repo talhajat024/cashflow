@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using CashFlow.Api.Application.DTOs;
 using CashFlow.Api.Application.Interfaces;
+using System.Formats.Asn1;
+using CashFlow.Api.Domain.Enums;
 namespace CashFlow.Api.Controllers;
 
 
@@ -15,23 +17,11 @@ public class DashboardController:ControllerBase
     }
     
     [HttpGet("overview")]
-    public IActionResult GetOverview()
+    public async Task<ActionResult<DashboardOverviewDto>> GetOverview([FromQuery] TimeRange spendingRange = TimeRange.Monthly,[FromQuery] int balanceRangeInMonths=6)
     {
         var userId = GetCurrentUserId();
-        var overview =  _dashboardService.GetOverview(userId);
-        var dto= new DashboardOverviewDto
-        {
-            TotalBalance = overview.TotalBalance,
-        TotalIncome = overview.TotalIncome,
-        TotalSpending = overview.TotalSpending,
-        RecentTransactions = overview.RecentTransactions.Select(t => new TransactionDto
-        {
-            Amount = t.Amount,
-            Type = t.Type.ToString(),
-            Date = t.CreatedAt
-        }).ToList()
-        };
-        return Ok(dto);
+        var overview =  await _dashboardService.GetOverviewAsync(userId,spendingRange,balanceRangeInMonths);
+        return Ok(overview);
     }
 
     private Guid GetCurrentUserId()
