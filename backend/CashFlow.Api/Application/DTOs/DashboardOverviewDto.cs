@@ -1,11 +1,16 @@
+using CashFlow.Api.Application.DTOs.BalanceOverview;
+using CashFlow.Api.Application.DTOs.Spending;
+using CashFlow.Api.Application.DTOs.SummaryCards;
+using CashFlow.Api.Application.DTOs.Transactions;
 namespace CashFlow.Api.Application.DTOs;
 
 public class DashboardOverviewDto
 {
-    public decimal TotalBalance {get;set;}
-    public decimal TotalIncome {get;set;}
-    public decimal TotalSpending {get;set;}
+    public IReadOnlyList<SummaryCardDto> SummaryCards { get; set; }
+        = Array.Empty<SummaryCardDto>();
 
-    public IEnumerable<TransactionDto> RecentTransactions { get; set; } = [];
-
+    public BalanceOverviewChartDto BalanceOverviewChart {get;set;} = new();
+    public AllSpendingDto AllSpending { get; set; } = new();
+    
+    public List<TransactionDto> RecentTransactions { get; set; } = [];
 }

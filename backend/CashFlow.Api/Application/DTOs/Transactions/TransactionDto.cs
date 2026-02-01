@@ -1,6 +1,4 @@
-using System;
-
-namespace CashFlow.Api.Application.DTOs;
+namespace CashFlow.Api.Application.DTOs.Transactions;
 
 public class TransactionDto
 {
@@ -10,5 +8,5 @@ public class TransactionDto
     public DateTime Date {get;set;}
     public decimal Amount {get;set;}
     public string Status {get;set;} =default!;
-    public string Icon {get;set;}= default!;
+    public string IconKey {get;set;}= default!;
 }
