@@ -30,9 +30,9 @@ export default function DashboardPage() {
       <DashboardHeader/>
         <PageContainer>
          <div className="flex flex-col gap-6">
-          <OverviewStats  />
-          <DashboardInsights />
-          <RecentTransactions />
+          <OverviewStats cards={data.summaryCards}  />
+          <DashboardInsights balanceChart={data.balanceOverviewChart} allSpending={data.allSpending} onSpendingRangeChange={setSpendingRange} />
+          <RecentTransactions transactions={data.recentTransactions}/>
         </div>
         </PageContainer>
     </>
