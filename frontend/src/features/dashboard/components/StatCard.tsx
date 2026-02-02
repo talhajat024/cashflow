@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { MiniChart } from "../../../shared/ui/charts";
+
 import {
   card,
   header,
@@ -13,27 +14,34 @@ import {
 } from "./StatCard.styles";
 
 type Trend = {
+  percentage: number;
   label: string;
   positive: boolean;
 };
 
 type StatCardProps = {
- title: string;
+  title: string;
   period: string;
-  value: string;
+  amount: number;
+  currency: string;
   icon: ReactNode;
   trend: Trend;
   tone?: "blue" | "green" | "red";
+  miniChartData?: number[];
 };
 
 export function StatCard({
   title,
   period,
-  value,
+  amount,
+  currency,
   icon,
   tone,
   trend,
+  miniChartData,
 }: StatCardProps) {
+  const formattedAmount = `${currency}${amount.toLocaleString()}`;
+
   return (
     <div className={card()}>
       <div className={header()}>
@@ -47,18 +55,22 @@ export function StatCard({
 
       <div className={content()}>
         <div>
-          <p className={valueText()}>{value}</p>
+          <p className={valueText()}>{formattedAmount}</p>
+
           <p className={trendText({ positive: trend.positive })}>
-            {trend.label}
+            {trend.positive ? "+" : ""}
+            {trend.percentage}% {trend.label}
           </p>
         </div>
 
-        <div className={chartWrapper()}>
-          <MiniChart
-          data={[30, 45, 40, 60, 55, 70]}
-          positive={trend.positive}
-          />
-        </div>
+        {miniChartData && (
+          <div className={chartWrapper()}>
+            <MiniChart
+              data={miniChartData}
+              positive={trend.positive}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

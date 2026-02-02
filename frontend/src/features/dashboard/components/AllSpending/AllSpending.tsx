@@ -18,65 +18,81 @@
     CardHeader,
     CardContent,
     } from "../../../../shared/ui/card/Card";
-    import { SpendingDonutChart } from "./SpendingDonutChart";
 
+    import { SpendingDonutChart } from "./SpendingDonutChart";
     import { SpendingRow } from "./SpendingRow";
 
-    export function AllSpending() {
-    return (
-        <Card>
-        
-        <CardHeader className={header()}>
-            <h3 className={title()}>All Spending</h3>
-            <button className={menuButton()}>
-            <MoreHorizontal size={18} />
-            </button>
-        </CardHeader>
+    import type { TimeRange, AllSpending as AllSpendingType } 
+  from "../../types/dashboard.types";
 
-        <CardContent className={wrapper()}>
-            <div className={summaryRow()}>
-            <div className={summaryItem()}>
-                <span className={summaryLabel()}>Weekly</span>
-                <span className={summaryValue()}>$874.00</span>
-            </div>
+type AllSpendingProps = {
+  data: AllSpendingType;
+  onRangeChange: (range: TimeRange) => void;
+};
 
-            <div className={summaryItem()}>
-                <span className={summaryLabel()}>Monthly</span>
-                <span className={summaryValue()}>$8,985.56</span>
-            </div>
 
-            <div className={summaryItem()}>
-                <span className={summaryLabel()}>Yearly</span>
-                <span className={summaryValue()}>$28,985.56</span>
-            </div>
-            </div>
+    export function AllSpending({ data, onRangeChange }: AllSpendingProps) {
+  const { currency, summary, chart, activeRange } = data;
 
-            <div className={content()}>
-            {/* Donut chart placeholder (SVG comes next) */}
-            <div className={chartArea()}>
-                <SpendingDonutChart />
-            </div>
+  return (
+    <Card>
+      <CardHeader className={header()}>
+        <h3 className={title()}>All Spending</h3>
 
-            {/* Legend */}
-            <div className={legendArea()}>
-                <SpendingRow
-                color="blue"
-                label="Workspace"
-                value={46}
-                />
-                <SpendingRow
-                color="green"
-                label="Employee Salary"
-                value={52}
-                />
-                <SpendingRow
-                color="cyan"
-                label="Shopping"
-                value={24}
-                />
-            </div>
-            </div>
-        </CardContent>
-        </Card>
-    );
-    }
+        {/* Optional future menu */}
+        <button className={menuButton()}>
+          <MoreHorizontal size={18} />
+        </button>
+      </CardHeader>
+
+      <CardContent className={wrapper()}>
+        {/* ===== Summary ===== */}
+        <div className={summaryRow()}>
+          <div className={summaryItem()}>
+            <span className={summaryLabel()}>Weekly</span>
+            <span className={summaryValue()}>
+              {currency}{summary.weekly.toFixed(2)}
+            </span>
+          </div>
+
+          <div className={summaryItem()}>
+            <span className={summaryLabel()}>Monthly</span>
+            <span className={summaryValue()}>
+              {currency}{summary.monthly.toFixed(2)}
+            </span>
+          </div>
+
+          <div className={summaryItem()}>
+            <span className={summaryLabel()}>Yearly</span>
+            <span className={summaryValue()}>
+              {currency}{summary.yearly.toFixed(2)}
+            </span>
+          </div>
+        </div>
+
+        {/* ===== Chart + Legend ===== */}
+        <div className={content()}>
+          <div className={chartArea()}>
+            <SpendingDonutChart
+              total={chart.total}
+              categories={chart.categories}
+              activeRange={activeRange}
+              onRangeChange={onRangeChange}
+            />
+          </div>
+
+          <div className={legendArea()}>
+            {chart.categories.map((category) => (
+              <SpendingRow
+                key={category.key}
+                categoryKey={category.key}
+                label={category.label}
+                value={category.percentage}
+              />
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
