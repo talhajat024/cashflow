@@ -13,15 +13,15 @@ type OverviewStatsProps = {
 };
 
 const ICON_MAP: Record<string, React.ReactNode> = {
-  balance: <Wallet size={18} />,
-  income: <TrendingUp size={18} />,
-  spending: <TrendingDown size={18} />,
+  totalBalance: <Wallet size={18} />,
+  totalIncome: <TrendingUp size={18} />,
+  totalSpending: <TrendingDown size={18} />,
 };
 
 const TONE_MAP: Record<string, "blue" | "green" | "red"> = {
-  balance: "blue",
-  income: "green",
-  spending: "red",
+  totalBalance: "blue",
+  totalIncome: "green",
+  totalSpending: "red",
 };
 
 export function OverviewStats({ cards }: OverviewStatsProps) {
@@ -40,20 +40,20 @@ export function OverviewStats({ cards }: OverviewStatsProps) {
 
           return (
            <StatCard
-  key={card.key}
-  title={card.title}
-  period={card.dateRange}
-  amount={card.amount}
-  currency={card.currency}
-  icon={icon}
-  tone={tone}
-  trend={{
-    percentage: card.percentageChange,
-    label: card.comparisonLabel,
-    positive: card.isPositiveTrend,
-  }}
-  miniChartData={[30, 45, 40, 60, 55, 70]} // optional, replace later
-/>
+            key={card.key}
+            title={card.title}
+            period={card.dateRange}
+            amount={card.amount}
+            currency={card.currency}
+            icon={icon}
+            tone={tone}
+            trend={{
+              percentage: card.percentageChange,
+              label: card.comparisonLabel,
+              positive: card.isPositiveTrend,
+            }}
+            miniChartData={[40, 65, 80]} // optional, replace later
+          />
           );
         })}
       </div>
