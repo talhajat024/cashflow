@@ -5,7 +5,7 @@ export async function getDashboardOverview(
     spendingRange:TimeRange,
     balanceRangeInMonths:number
 ):Promise<DashboardOverview>{
-    const response = await httpClient.get<DashboardOverview>("/dashbaord/overview",{
+    const response = await httpClient.get<DashboardOverview>("/dashboard/overview",{
         params:{
             spendingRange,
             balanceRangeInMonths,
