@@ -4,8 +4,18 @@ using CashFlow.Api.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options=>
+{
+    options.AddPolicy("AllowFrontend",policy=>
+    {
+        policy
+        .WithOrigins("https://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
 
 // DI
 builder.Services.AddScoped<IDashboardService, DashboardService>();
@@ -13,19 +23,18 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 
-
-// ✅ Native OpenAPI (ASP.NET Core)
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    // ✅ Exposes /openapi/v1.json
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
