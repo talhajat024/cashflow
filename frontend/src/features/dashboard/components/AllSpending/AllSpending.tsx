@@ -21,6 +21,7 @@
 
     import { SpendingDonutChart } from "./SpendingDonutChart";
     import { SpendingRow } from "./SpendingRow";
+    import { getCurrencySymbol } from "../../../../shared/utils/currency";
 
     import type { TimeRange, AllSpending as AllSpendingType } 
   from "../../types/dashboard.types";
@@ -35,7 +36,7 @@ type AllSpendingProps = {
   const { currency, summary, chart, activeRange } = data;
 
   return (
-    <Card>
+    <Card className={wrapper()}>
       <CardHeader className={header()}>
         <h3 className={title()}>All Spending</h3>
 
@@ -51,21 +52,21 @@ type AllSpendingProps = {
           <div className={summaryItem()}>
             <span className={summaryLabel()}>Weekly</span>
             <span className={summaryValue()}>
-              {currency}{summary.weekly.toFixed(2)}
+              {getCurrencySymbol(currency)}{summary.weekly.toFixed(2)}
             </span>
           </div>
 
           <div className={summaryItem()}>
             <span className={summaryLabel()}>Monthly</span>
             <span className={summaryValue()}>
-              {currency}{summary.monthly.toFixed(2)}
+              {getCurrencySymbol(currency)}{summary.monthly.toFixed(2)}
             </span>
           </div>
 
           <div className={summaryItem()}>
             <span className={summaryLabel()}>Yearly</span>
             <span className={summaryValue()}>
-              {currency}{summary.yearly.toFixed(2)}
+              {getCurrencySymbol(currency)}{summary.yearly.toFixed(2)}
             </span>
           </div>
         </div>
