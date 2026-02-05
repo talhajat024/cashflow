@@ -4,5 +4,5 @@ namespace CashFlow.Api.Application.Interfaces;
 
 public interface IDashboardService
 {
-    Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,TimeRange spendingRange,int balanceRangeInMonths);
+    Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,int balanceRangeInMonths);
 }

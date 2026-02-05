@@ -18,7 +18,7 @@ public class DashboardService : IDashboardService
     }
 
 
-    public async Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,TimeRange spendingRange,int balanceRangeInMonths)
+    public async Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,int balanceRangeInMonths)
     {
         var transactions= await _transactionService.GetAllAsync(userId);
 
@@ -26,7 +26,7 @@ public class DashboardService : IDashboardService
             {
                 SummaryCards=BuildSummaryCards(transactions),
                 BalanceOverviewChart = BuildBalanceOverviewChart(transactions,balanceRangeInMonths),
-                AllSpending = BuildAllSpending(transactions,spendingRange),
+                AllSpending = BuildAllSpending(transactions),
                 RecentTransactions = BuildRecentTransactions(transactions)
             };        
     }
@@ -141,7 +141,7 @@ public class DashboardService : IDashboardService
         };
     }
 
-    private AllSpendingDto BuildAllSpending(IEnumerable<Transaction> transactions,TimeRange range)
+    private AllSpendingDto BuildAllSpending(IEnumerable<Transaction> transactions)
     {
         var now = DateTime.UtcNow;
         var expenses = transactions
@@ -161,14 +161,18 @@ public class DashboardService : IDashboardService
             .Sum(t=> t.Amount)
         };    
 
-        // Active Range
-       DateTime rangeStart = range switch
-       {
-           TimeRange.Weekly => now.AddDays(-7),
-           TimeRange.Monthly => now.AddMonths(-1),
-           TimeRange.Yearly => now.AddYears(-1),
-           _=> now.AddMonths(-1)
-       };
+        // Build donut chart per range
+        var byRange = new Dictionary<TimeRange,DonutChartDto>();
+
+        foreach(var range in Enum.GetValues<TimeRange>())
+        {
+            DateTime rangeStart = range switch
+            {
+                TimeRange.Weekly=> now.AddDays(-7),
+                TimeRange.Monthly => now.AddMonths(-1),
+                TimeRange.Yearly => now.AddYears(-1),
+                 _ => now.AddMonths(-1)
+            };
 
        var rangeExpenses = expenses.Where(t=> t.CreatedAt >= rangeStart)
        .ToList();
@@ -188,16 +192,18 @@ public class DashboardService : IDashboardService
        }).OrderByDescending(c => c.Amount)
         .ToList();
 
+        byRange[range]= new DonutChartDto
+        {
+            Total=total,
+            Categories=categories
+        };
+        }
+
         return new AllSpendingDto
         {
-            ActiveRange = range,
             Currency="USD",
             Summary =summary,
-            Chart= new DonutChartDto
-            {
-                Total = total,
-                Categories= categories
-            }
+           ByRange=byRange
         };
     }
 

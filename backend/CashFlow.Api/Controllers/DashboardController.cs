@@ -17,10 +17,10 @@ public class DashboardController:ControllerBase
     }
     
     [HttpGet("overview")]
-    public async Task<ActionResult<DashboardOverviewDto>> GetOverview([FromQuery] TimeRange spendingRange = TimeRange.Monthly,[FromQuery] int balanceRangeInMonths=6)
+    public async Task<ActionResult<DashboardOverviewDto>> GetOverview([FromQuery] int balanceRangeInMonths=6)
     {
         var userId = GetCurrentUserId();
-        var overview =  await _dashboardService.GetOverviewAsync(userId,spendingRange,balanceRangeInMonths);
+        var overview =  await _dashboardService.GetOverviewAsync(userId,balanceRangeInMonths);
         return Ok(overview);
     }
 
