@@ -3,7 +3,6 @@ import {
   chartSvg,
   centerContent,
   centerValue,
-  centerLabel,
 } from "./SpendingDonutChart.styles";
 
 import type {
@@ -15,7 +14,6 @@ type SpendingDonutChartProps = {
   total: number;
   categories: SpendingCategory[];
   activeRange: TimeRange;
-  onRangeChange: (range: TimeRange) => void;
 };
 
 const SIZE = 180;
@@ -40,33 +38,13 @@ function getStroke(value: number, radius: number) {
   return `${(value / 100) * circumference} ${circumference}`;
 }
 
-const RANGES: TimeRange[] = ["Weekly", "Monthly", "Yearly"];
-
 export function SpendingDonutChart({
   total,
   categories,
   activeRange,
-  onRangeChange,
 }: SpendingDonutChartProps) {
   return (
     <div className={chartWrapper()}>
-      {/* ===== Range Selector ===== */}
-      <div className="flex justify-center gap-2 mb-2">
-        {RANGES.map((range) => (
-          <button
-            key={range}
-            onClick={() => onRangeChange(range)}
-            className={`text-xs px-2 py-1 rounded ${
-              range === activeRange
-                ? "bg-blue-500 text-white"
-                : "text-gray-500 hover:text-gray-800"
-            }`}
-          >
-            {range}
-          </button>
-        ))}
-      </div>
-
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         className={chartSvg()}
@@ -111,9 +89,6 @@ export function SpendingDonutChart({
       <div className={centerContent()}>
         <span className={centerValue()}>
           ${total.toFixed(0)}
-        </span>
-        <span className={centerLabel()}>
-          Total Spend ({activeRange})
         </span>
       </div>
     </div>

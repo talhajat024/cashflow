@@ -78,7 +78,7 @@ type AllSpendingProps = {
               total={chart.total}
               categories={chart.categories}
               activeRange={activeRange}
-              onRangeChange={onRangeChange}
+              // onRangeChange={onRangeChange}
             />
           </div>
 
