@@ -217,7 +217,7 @@ public class DashboardService : IDashboardService
             Type=t.Nature.ToString(),
             Date=t.CreatedAt,
             Amount = t.Amount,
-            Status = t.Status,
+            Status = t.Status.ToString(),
             IconKey = ResolveIconKey(t.CategoryKey)
         })
         .ToList();
