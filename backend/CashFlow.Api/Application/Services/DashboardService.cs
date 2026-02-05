@@ -212,12 +212,12 @@ public class DashboardService : IDashboardService
     {
         return transactions.OrderByDescending(t=> t.CreatedAt).Take(count).Select(t=> new TransactionDto
         {
-            Company= ResolveCompanyName(t),
-            Category = t.CategoryLabel,
-            Type=t.Type.ToString(),
+            Company= t.CounterpartyName,
+            Category = t.MerchantCategory,
+            Type=t.Nature.ToString(),
             Date=t.CreatedAt,
             Amount = t.Amount,
-            Status = "Completed",
+            Status = t.Status,
             IconKey = ResolveIconKey(t.CategoryKey)
         })
         .ToList();
