@@ -10,30 +10,31 @@ import { useDashboardOverview } from "../../../shared/hooks/useDashboardOverview
 export default function DashboardPage() {
 
   const [spendingRange,setSpendingRange] = useState<TimeRange>("Monthly");
-  const {data,loading,error} = useDashboardOverview(spendingRange,6);
+  const {data,loading,error} = useDashboardOverview(6);
 
-  if(loading)
-  {
-    return <div>... Loading Dashboard</div>
-  }
   if(error)
   {
     return <div>{error}</div>
-  }
-  if(!data)
-  {
-    return null;
   }
 
   return (
     <>
       <DashboardHeader/>
         <PageContainer>
-         <div className="flex flex-col gap-6">
+          {/* page -level loading indicator */}
+          {loading && (
+            <div className="text-sm text-gray-400 mb-2">
+                Updating dashboard...
+            </div>
+          )}
+          {data && (
+             <div className="flex flex-col gap-6">
           <OverviewStats cards={data.summaryCards}  />
-          <DashboardInsights balanceChart={data.balanceOverviewChart} allSpending={data.allSpending} onSpendingRangeChange={setSpendingRange} />
+          <DashboardInsights balanceChart={data.balanceOverviewChart} allSpending={data.allSpending} activeRange={spendingRange} onSpendingRangeChange={setSpendingRange} />
           <RecentTransactions transactions={data.recentTransactions}/>
         </div>
+
+          )}
         </PageContainer>
     </>
   )

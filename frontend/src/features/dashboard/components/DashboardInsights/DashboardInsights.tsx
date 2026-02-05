@@ -5,12 +5,14 @@ import type { BalanceOverviewChart,AllSpending as AllSpendingType,TimeRange } fr
 interface DashboardInsightProps{
     balanceChart:BalanceOverviewChart;
     allSpending:AllSpendingType;
+    activeRange:TimeRange;
     onSpendingRangeChange:(range:TimeRange)=>void;
 }
 
 export function DashboardInsights({
     balanceChart,
     allSpending,
+    activeRange,
     onSpendingRangeChange
 }:DashboardInsightProps)
 {
@@ -21,7 +23,7 @@ export function DashboardInsights({
                chart={balanceChart}/>
             </div>
             <div className="col-span-1">
-                <AllSpending data={allSpending} onRangeChange={onSpendingRangeChange} />
+                <AllSpending data={{...allSpending,activeRange}} onRangeChange={onSpendingRangeChange} />
             </div>
         </div>
     )

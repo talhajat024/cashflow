@@ -34,13 +34,13 @@ type AllSpendingProps = {
 
     export function AllSpending({ data, onRangeChange }: AllSpendingProps) {
   const { currency, summary, chart, activeRange } = data;
+  console.log("active range is:",activeRange);
 
   return (
     <Card className={wrapper()}>
       <CardHeader className={header()}>
         <h3 className={title()}>All Spending</h3>
 
-        {/* Optional future menu */}
         <button className={menuButton()}>
           <MoreHorizontal size={18} />
         </button>
@@ -49,26 +49,51 @@ type AllSpendingProps = {
       <CardContent className={wrapper()}>
         {/* ===== Summary ===== */}
         <div className={summaryRow()}>
-          <div className={summaryItem()}>
-            <span className={summaryLabel()}>Weekly</span>
-            <span className={summaryValue()}>
-              {getCurrencySymbol(currency)}{summary.weekly.toFixed(2)}
-            </span>
-          </div>
+               <div
+          className={`${summaryItem()} cursor-pointer transition ${
+            activeRange === "Weekly"
+              ? "text-gray-900 font-semibold"
+              : "hover:bg-gray-50 text-gray-500"
+          }`}
+          onClick={() => onRangeChange("Weekly")}
+        >
+          <span className={summaryLabel()}>Weekly</span>
+          <span className={summaryValue()}>
+            {getCurrencySymbol(currency)}
+            {summary.weekly.toFixed(2)}
+          </span>
+        </div>
 
-          <div className={summaryItem()}>
-            <span className={summaryLabel()}>Monthly</span>
-            <span className={summaryValue()}>
-              {getCurrencySymbol(currency)}{summary.monthly.toFixed(2)}
-            </span>
-          </div>
+              <div
+        className={`${summaryItem()} cursor-pointer transition ${
+          activeRange === "Monthly"
+            ? "text-gray-900 font-semibold"
+            : "hover:bg-gray-50 text-gray-500"
+        }`}
+        onClick={() => onRangeChange("Monthly")}
+      >
+        <span className={summaryLabel()}>Monthly</span>
+        <span className={summaryValue()}>
+          {getCurrencySymbol(currency)}
+          {summary.monthly.toFixed(2)}
+        </span>
+      </div>
 
-          <div className={summaryItem()}>
-            <span className={summaryLabel()}>Yearly</span>
-            <span className={summaryValue()}>
-              {getCurrencySymbol(currency)}{summary.yearly.toFixed(2)}
-            </span>
-          </div>
+        <div
+        className={`${summaryItem()} cursor-pointer transition ${
+          activeRange === "Yearly"
+            ? "text-gray-900 font-semibold"
+            : "hover:bg-gray-50 text-gray-500"
+        }`}
+        onClick={() => onRangeChange("Yearly")}
+      >
+        <span className={summaryLabel()}>Yearly</span>
+        <span className={summaryValue()}>
+          {getCurrencySymbol(currency)}
+          {summary.yearly.toFixed(2)}
+        </span>
+      </div>
+
         </div>
 
         {/* ===== Chart + Legend ===== */}
@@ -78,7 +103,6 @@ type AllSpendingProps = {
               total={chart.total}
               categories={chart.categories}
               activeRange={activeRange}
-              // onRangeChange={onRangeChange}
             />
           </div>
 

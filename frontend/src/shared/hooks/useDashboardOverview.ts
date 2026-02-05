@@ -1,8 +1,8 @@
 import { useEffect,useState } from "react";
-import type { DashboardOverview,TimeRange } from "../../features/dashboard/types/dashboard.types";
+import type { DashboardOverview } from "../../features/dashboard/types/dashboard.types";
 import { getDashboardOverview } from "../../features/dashboard/api/dashboard.api";
 
-export function useDashboardOverview(spendingRange:TimeRange,balanceRangeInMonths:number){
+export function useDashboardOverview(balanceRangeInMonths:number){
 
     const [data,setData]=useState<DashboardOverview | null>(null);
     const [loading,setLoading]=useState(true);
@@ -13,7 +13,7 @@ export function useDashboardOverview(spendingRange:TimeRange,balanceRangeInMonth
         setLoading(true);
         setError(null);
 
-        getDashboardOverview(spendingRange,balanceRangeInMonths)
+        getDashboardOverview(balanceRangeInMonths)
         .then((res)=>{
             if(!cancelled) setData(res);
         })
@@ -27,7 +27,7 @@ export function useDashboardOverview(spendingRange:TimeRange,balanceRangeInMonth
         return ()=> {
             cancelled=true;
         };
-    },[spendingRange,balanceRangeInMonths]);
+    },[balanceRangeInMonths]);
 
     return {data,loading,error}
 }
