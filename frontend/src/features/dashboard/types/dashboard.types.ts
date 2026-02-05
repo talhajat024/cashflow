@@ -49,11 +49,14 @@ export interface DonutChart{
     categories:SpendingCategory[];
 }
 
-export interface AllSpending{
-    activeRange :TimeRange;
-    currency:string;
-    summary:SpendingSummary;
-    chart:DonutChart;
+export interface AllSpending {
+  currency: string;
+  summary: SpendingSummary;
+  byRange: {
+    Weekly: DonutChart;
+    Monthly: DonutChart;
+    Yearly: DonutChart;
+  };
 }
 
 // Transactions

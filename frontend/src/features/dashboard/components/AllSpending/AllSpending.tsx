@@ -1,40 +1,50 @@
-    import { MoreHorizontal } from "lucide-react";
-    import {
-    wrapper,
-    header,
-    title,
-    menuButton,
-    summaryRow,
-    summaryItem,
-    summaryLabel,
-    summaryValue,
-    content,
-    chartArea,
-    legendArea,
-    } from "./AllSpending.styles";
+import { MoreHorizontal } from "lucide-react";
+import {
+  wrapper,
+  header,
+  title,
+  menuButton,
+  summaryRow,
+  summaryItem,
+  summaryLabel,
+  summaryValue,
+  content,
+  chartArea,
+  legendArea,
+} from "./AllSpending.styles";
 
-    import {
-    Card,
-    CardHeader,
-    CardContent,
-    } from "../../../../shared/ui/card/Card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+} from "../../../../shared/ui/card/Card";
 
-    import { SpendingDonutChart } from "./SpendingDonutChart";
-    import { SpendingRow } from "./SpendingRow";
-    import { getCurrencySymbol } from "../../../../shared/utils/currency";
+import { SpendingDonutChart } from "./SpendingDonutChart";
+import { SpendingRow } from "./SpendingRow";
+import { getCurrencySymbol } from "../../../../shared/utils/currency";
 
-    import type { TimeRange, AllSpending as AllSpendingType } 
-  from "../../types/dashboard.types";
+import type {
+  TimeRange,
+  AllSpending as AllSpendingType,
+} from "../../types/dashboard.types";
 
 type AllSpendingProps = {
   data: AllSpendingType;
+  activeRange: TimeRange;
   onRangeChange: (range: TimeRange) => void;
 };
 
+export function AllSpending({
+  data,
+  activeRange,
+  onRangeChange,
+}: AllSpendingProps) {
+  console.log("The data is:",data);
+  const { byRange,currency, summary } = data;
 
-    export function AllSpending({ data, onRangeChange }: AllSpendingProps) {
-  const { currency, summary, chart, activeRange } = data;
-  console.log("active range is:",activeRange);
+  const chart = byRange[activeRange];
+  console.log("chart is:",chart);
+  console.log("The active range is:",activeRange)
 
   return (
     <Card className={wrapper()}>
@@ -47,53 +57,25 @@ type AllSpendingProps = {
       </CardHeader>
 
       <CardContent className={wrapper()}>
-        {/* ===== Summary ===== */}
+        {/* ===== Summary (acts as range selector) ===== */}
         <div className={summaryRow()}>
-               <div
-          className={`${summaryItem()} cursor-pointer transition ${
-            activeRange === "Weekly"
-              ? "text-gray-900 font-semibold"
-              : "hover:bg-gray-50 text-gray-500"
-          }`}
-          onClick={() => onRangeChange("Weekly")}
-        >
-          <span className={summaryLabel()}>Weekly</span>
-          <span className={summaryValue()}>
-            {getCurrencySymbol(currency)}
-            {summary.weekly.toFixed(2)}
-          </span>
-        </div>
-
-              <div
-        className={`${summaryItem()} cursor-pointer transition ${
-          activeRange === "Monthly"
-            ? "text-gray-900 font-semibold"
-            : "hover:bg-gray-50 text-gray-500"
-        }`}
-        onClick={() => onRangeChange("Monthly")}
-      >
-        <span className={summaryLabel()}>Monthly</span>
-        <span className={summaryValue()}>
-          {getCurrencySymbol(currency)}
-          {summary.monthly.toFixed(2)}
-        </span>
-      </div>
-
-        <div
-        className={`${summaryItem()} cursor-pointer transition ${
-          activeRange === "Yearly"
-            ? "text-gray-900 font-semibold"
-            : "hover:bg-gray-50 text-gray-500"
-        }`}
-        onClick={() => onRangeChange("Yearly")}
-      >
-        <span className={summaryLabel()}>Yearly</span>
-        <span className={summaryValue()}>
-          {getCurrencySymbol(currency)}
-          {summary.yearly.toFixed(2)}
-        </span>
-      </div>
-
+          {(["Weekly", "Monthly", "Yearly"] as TimeRange[]).map((range) => (
+            <div
+              key={range}
+              className={`${summaryItem()} cursor-pointer transition ${
+                activeRange === range
+                  ? "text-gray-900 font-semibold"
+                  : "text-gray-500 hover:bg-gray-50"
+              }`}
+              onClick={() => onRangeChange(range)}
+            >
+              <span className={summaryLabel()}>{range}</span>
+              <span className={summaryValue()}>
+                {getCurrencySymbol(currency)}
+                {summary[range.toLowerCase() as "weekly" | "monthly" | "yearly"].toFixed(2)}
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* ===== Chart + Legend ===== */}
@@ -102,7 +84,6 @@ type AllSpendingProps = {
             <SpendingDonutChart
               total={chart.total}
               categories={chart.categories}
-              activeRange={activeRange}
             />
           </div>
 

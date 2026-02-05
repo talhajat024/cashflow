@@ -7,26 +7,24 @@ import {
 
 import type {
   SpendingCategory,
-  TimeRange,
 } from "../../types/dashboard.types";
 
 type SpendingDonutChartProps = {
   total: number;
   categories: SpendingCategory[];
-  activeRange: TimeRange;
 };
 
-const SIZE = 180;
+const SIZE = 150;
 const CENTER = SIZE / 2;
-const STROKE_WIDTH = 10;
+const STROKE_WIDTH = 9;
 
-const BASE_RADIUS = 78;
-const RADIUS_STEP = 18;
+const BASE_RADIUS = 65;
+const RADIUS_STEP = 15;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  workspace: "#2563EB",
-  salary: "#22C55E",
-  shopping: "#22D3EE",
+  workspace: "#1D4ED8", // dark blue
+  employeesalary: "#F97316",    // orange
+  shopping: "#22D3EE",  // cyan
   food: "#F97316",
   travel: "#A855F7",
 };
@@ -41,7 +39,6 @@ function getStroke(value: number, radius: number) {
 export function SpendingDonutChart({
   total,
   categories,
-  activeRange,
 }: SpendingDonutChartProps) {
   return (
     <div className={chartWrapper()}>

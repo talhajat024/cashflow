@@ -11,7 +11,7 @@ import type { SpendingCategory } from "../../types/dashboard.types";
 // Same color map as donut (keep consistent)
 const CATEGORY_COLORS: Record<string, string> = {
   workspace: "#2563EB",
-  salary: "#22C55E",
+  employeesalary: "#F97316",
   shopping: "#22D3EE",
   food: "#F97316",
   travel: "#A855F7",

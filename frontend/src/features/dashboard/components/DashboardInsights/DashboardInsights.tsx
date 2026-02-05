@@ -23,7 +23,11 @@ export function DashboardInsights({
                chart={balanceChart}/>
             </div>
             <div className="col-span-1">
-                <AllSpending data={{...allSpending,activeRange}} onRangeChange={onSpendingRangeChange} />
+                <AllSpending
+                  data={allSpending}
+                  activeRange={activeRange}
+                  onRangeChange={onSpendingRangeChange}
+                />
             </div>
         </div>
     )
