@@ -30,7 +30,7 @@ public enum TransactionType
 
 public enum TransactionStatus
 {
-    Pending,
+    Incomplete,
     Completed,
     Failed
 }
