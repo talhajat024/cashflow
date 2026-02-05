@@ -208,7 +208,7 @@ public class DashboardService : IDashboardService
     }
 
 
-    private List<TransactionDto> BuildRecentTransactions(IEnumerable<Transaction> transactions,int count =5)
+    private List<TransactionDto> BuildRecentTransactions(IEnumerable<Transaction> transactions,int count =2)
     {
         return transactions.OrderByDescending(t=> t.CreatedAt).Take(count).Select(t=> new TransactionDto
         {
