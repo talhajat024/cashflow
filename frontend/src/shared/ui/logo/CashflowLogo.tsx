@@ -1,16 +1,47 @@
-interface CashflowLogoProps{
-size?:number
+interface CashflowLogoProps {
+  size?: number;
 }
 
-export const CashflowLogo=({size=36}:CashflowLogoProps)=>{
-    return(
-        <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cashflow logo">
-            <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.2)"/>
-            <path
-             d="M24.6 14.9C23.7 13.8 22.2 13.2 20.4 13.2C17.3 13.2 15 15.3 15 19.9C15 24.5 17.3 26.6 20.5 26.6C22.4 26.6 23.9 25.9 24.9 24.7"
+export const CashflowLogo = ({ size = 24 }: CashflowLogoProps) => {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="13 10 14 20" 
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Cashflow logo"
+    >
+      {/* Base white C */}
+      <path
+        d="M26 14
+           C24.6 12.5 22.6 11.8 20.3 11.8
+           C15.9 11.8 13 14.9 13 20
+           C13 25.1 15.9 28.2 20.3 28.2
+           C22.6 28.2 24.6 27.4 26 25.8"
         stroke="white"
-        strokeWidth="2.4"
-        strokeLinecap="round"/>
-        </svg>
-    )
-}
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      {/* Cyan top accent */}
+      <path
+        d="M26 14
+           C24.6 12.5 22.6 11.8 20.3 11.8"
+        stroke="#22D3EE"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+
+      {/* Cyan bottom accent */}
+      <path
+        d="M20.3 28.2
+           C22.6 28.2 24.6 27.4 26 25.8"
+        stroke="#22D3EE"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+};

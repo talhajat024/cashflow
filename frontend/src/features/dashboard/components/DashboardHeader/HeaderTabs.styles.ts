@@ -1,7 +1,11 @@
 import { tv } from "tailwind-variants";
 
+export const tabsContainer = tv({
+  base: "relative",
+});
+
 export const tabs = tv({
-  base: "flex items-center gap-8",
+  base: "flex items-center gap-8 relative z-10",
 });
 
 export const tabItem = tv({
@@ -13,6 +17,7 @@ export const tabItem = tv({
     cursor-pointer
     transition-colors
     duration-200
+    py-2
   `,
   variants: {
     active: {
@@ -29,12 +34,18 @@ export const tabUnderline = tv({
   base: `
     absolute
     left-0
-    -bottom-[6px]
+    -bottom-[1px]
     h-[2px]
     w-full
     bg-white
     rounded-full
     origin-left
     animate-tab-underline
+    z-20
   `,
+});
+
+// Add this new style for the base underline
+export const baseUnderline = tv({
+  base: "absolute left-0 right-0 bottom-0 h-[1px] bg-white/20",
 });

@@ -5,13 +5,12 @@ import { Badge } from '../../../../shared/ui/badge/Badge'
 
 const layout = {
   inner:
-    'flex h-[84px] items-center justify-between',
+    'flex h-[72px] items-center justify-between',
 }
 
 const brand = {
-  wrapper: 'flex items-center gap-3 text-white',
-  logo: 'h-9 w-9 rounded-full bg-white/20',
-  text: 'text-[20px] font-semibold tracking-wide text-white',
+  wrapper: 'flex items-center gap-2 text-white relative top-[1px]',
+  text: 'text-[20px] font-semibold tracking-wide text-slate-50',
 }
 
 const navigation = {
