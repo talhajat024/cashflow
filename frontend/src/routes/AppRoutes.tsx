@@ -1,12 +1,33 @@
-import { Routes,Route } from "react-router-dom";
+import { Routes,Route, Navigate } from "react-router-dom";
+import DashboardLayout from "../features/dashboard/layout/DashboardLayout";
+
+import OverviewPage from "../features/dashboard/pages/OverviewPage";
+import WalletPage from "../features/dashboard/pages/WalletPage";
+import InvoicePage from "../features/dashboard/pages/InvoicePage";
+import ProfilePage from "../features/dashboard/pages/ProfilePage";
+import SettingsPage from "../features/dashboard/pages/SettingsPage";
+import HelpPage from "../features/dashboard/pages/HelpPage";
+import ReportPage from "../features/dashboard/pages/ReportPage";
 
 const AppRoutes = ()=>
 {
     return(
         <Routes>
-            <Route path="/" element={<h2>Dashboard</h2>}/>
-            <Route path="/wallet" element={<h2>Wallet</h2>}/>
-            <Route path="/invoices" element={<h2>Invoice</h2>}/>
+            <Route path="/dashboard" element={<DashboardLayout/>}>
+            {/*Default */}
+            <Route index element={<Navigate to="overview" replace/>}/>
+            {/* Tabs */}
+            <Route path="overview" element={<OverviewPage/>}/>
+            <Route path="wallet" element={<WalletPage />} />
+            <Route path="invoice" element={<InvoicePage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="help" element={<HelpPage />} />
+            <Route path="report" element={<ReportPage />} />
+            </Route>
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     )
 }

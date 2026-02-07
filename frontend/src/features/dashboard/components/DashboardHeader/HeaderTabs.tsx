@@ -1,4 +1,5 @@
 import { tabs, tabItem, tabUnderline, tabsContainer,baseUnderline } from "./HeaderTabs.styles";
+import { NavLink } from "react-router-dom";
 
 const ITEMS = [
   'Overview',
@@ -11,24 +12,27 @@ const ITEMS = [
 ];
 
 export const HeaderTabs = () => {
-  const activeTab = 'Overview';
 
   return (
     <div className={tabsContainer()}>
-      <nav className={tabs()} role="tablist">
+      <nav className={tabs()}>
         {ITEMS.map((item) => {
-          const isActive = item === activeTab;
+          const tabPath = item.toLowerCase();
 
           return (
-            <span
+            <NavLink
               key={item}
-              role="tab"
-              aria-selected={isActive}
-              className={tabItem({ active: isActive })}
-            >
-              {item}
-              {isActive && <span className={tabUnderline()} />}
-            </span>
+              to={tabPath}
+              end={tabPath === "overview"}
+              className={({isActive})=> 
+                tabItem({active:isActive})}>
+                 {({ isActive }) => (
+                <>
+                  {item}
+                  {isActive && <span className={tabUnderline()} />}
+                </>
+              )}
+            </NavLink>
           );
         })}
       </nav>
