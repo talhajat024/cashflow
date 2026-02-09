@@ -30,7 +30,7 @@ export default function OverviewPage() {
       )}
 
       {data && (
-        <div className="-mt-32 flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <OverviewStats cards={data.summaryCards} />
 
           <DashboardInsights

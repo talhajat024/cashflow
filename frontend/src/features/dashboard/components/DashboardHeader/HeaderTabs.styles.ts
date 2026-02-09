@@ -5,7 +5,7 @@ export const tabsContainer = tv({
 });
 
 export const tabs = tv({
-  base: "flex items-center gap-8 relative z-10",
+  base: "flex items-center gap-10 relative z-10",
 });
 
 export const tabItem = tv({
