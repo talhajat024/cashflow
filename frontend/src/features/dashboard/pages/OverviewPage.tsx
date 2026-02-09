@@ -1,13 +1,20 @@
+import { useOutletContext } from "react-router-dom";
+import type { TimeRange,DashboardOverview } from "../types/dashboard.types";
+
 import { OverviewStats } from "../components/OverviewStats";
 import { RecentTransactions } from "../components/RecentTransactions/RecentTransactions";
 import { DashboardInsights } from "../components/DashboardInsights/DashboardInsights";
-import type { TimeRange } from "../types/dashboard.types";
-import { useState } from "react";
-import { useDashboardOverview } from "../../../shared/hooks/useDashboardOverview";
+
+type DashboardContext = {
+  data:DashboardOverview | null;
+  loading:boolean;
+  error:string | null;
+  spendingRange: TimeRange;
+  setSpendingRange:(range:TimeRange)=>void;
+}
 
 export default function OverviewPage() {
-  const [spendingRange, setSpendingRange] = useState<TimeRange>("Monthly");
-  const { data, loading, error } = useDashboardOverview(6);
+  const { data, loading, error,spendingRange,setSpendingRange } = useOutletContext<DashboardContext>();
 
   if (error) {
     return <div>{error}</div>;
@@ -23,7 +30,7 @@ export default function OverviewPage() {
       )}
 
       {data && (
-        <div className="flex flex-col gap-6">
+        <div className="-mt-32 flex flex-col gap-6">
           <OverviewStats cards={data.summaryCards} />
 
           <DashboardInsights

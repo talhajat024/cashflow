@@ -1,21 +1,23 @@
 import { Routes,Route, Navigate } from "react-router-dom";
+import { lazy,Suspense } from "react";
 import DashboardLayout from "../features/dashboard/layout/DashboardLayout";
 
-import OverviewPage from "../features/dashboard/pages/OverviewPage";
-import WalletPage from "../features/dashboard/pages/WalletPage";
-import InvoicePage from "../features/dashboard/pages/InvoicePage";
-import ProfilePage from "../features/dashboard/pages/ProfilePage";
-import SettingsPage from "../features/dashboard/pages/SettingsPage";
-import HelpPage from "../features/dashboard/pages/HelpPage";
-import ReportPage from "../features/dashboard/pages/ReportPage";
+const OverviewPage = lazy(()=> import ("../features/dashboard/pages/OverviewPage"));
+const WalletPage =lazy (()=>import ("../features/dashboard/pages/WalletPage"));
+const InvoicePage = lazy (()=>import ("../features/dashboard/pages/InvoicePage"));
+const ProfilePage =lazy (()=>import ("../features/dashboard/pages/ProfilePage"));
+const SettingsPage= lazy (()=>import ("../features/dashboard/pages/SettingsPage"));
+const HelpPage = lazy (()=>import ("../features/dashboard/pages/HelpPage"));
+const ReportPage= lazy (()=>import ("../features/dashboard/pages/ReportPage"));
 
 const AppRoutes = ()=>
 {
     return(
-        <Routes>
-            <Route path="/dashboard" element={<DashboardLayout/>}>
+        <Suspense fallback={<div className="p-6 text-sm text-gray-400">Loading Page...</div>}>
+             <Routes>
+            <Route path="/" element={<Navigate to="/dashboard/overview"/>}/>
             {/*Default */}
-            <Route index element={<Navigate to="overview" replace/>}/>
+            <Route path="/dashboard" element={<DashboardLayout/>}>
             {/* Tabs */}
             <Route path="overview" element={<OverviewPage/>}/>
             <Route path="wallet" element={<WalletPage />} />
@@ -25,10 +27,8 @@ const AppRoutes = ()=>
             <Route path="help" element={<HelpPage />} />
             <Route path="report" element={<ReportPage />} />
             </Route>
-
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        </Suspense>
     )
 }
 

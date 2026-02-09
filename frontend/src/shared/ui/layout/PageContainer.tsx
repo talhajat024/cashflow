@@ -1,9 +1,20 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 
-export function PageContainer({children}:{children:ReactNode}){
-    return(
-        <div className="mx-auto max-w-[1200px] px-8 w-full">
-            {children}
-        </div>
-    )
+type PageContainerProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+export function PageContainer({ children, className }: PageContainerProps) {
+  return (
+    <div
+      className={clsx(
+        "mx-auto max-w-[1200px] px-8 w-full",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
 }
