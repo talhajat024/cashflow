@@ -2,7 +2,7 @@ import { Search, Mail, Bell } from 'lucide-react'
 import { Avatar } from '../../../../shared/ui'
 import { CashflowLogo } from '../../../../shared/ui/logo'
 import { Badge } from '../../../../shared/ui/badge/Badge'
-import { Link } from 'react-router-dom'
+import { NavLink,Link } from 'react-router-dom'
 
 const layout = {
   inner:
@@ -36,6 +36,13 @@ const actions = {
     'absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500',
 }
 
+const NAV_ITEMS=[
+  {label:'Dashboard',to:'/dashboard'},
+  {label:'Analytics',to:'/analytics'},
+  {label:'Transactions',to:'/transactions'},
+  {label:'Wallets',to:'/wallets'}
+]
+
 
 
 export const TopBar = () => {
@@ -49,19 +56,12 @@ export const TopBar = () => {
         </Link>
 
         {/* CENTER — Navigation */}
-        <nav className={navigation.wrapper}>
-          <a href="#" className={navigation.link}>
-            Dashboard
-          </a>
-          <a href="#" className={navigation.link}>
-            Analytics
-          </a>
-          <a href="#" className={navigation.link}>
-            Transactions
-          </a>
-          <a href="#" className={navigation.link}>
-            Walletes
-          </a>
+        <nav className={navigation.wrapper} aria-label="Main navigation">
+          {NAV_ITEMS.map(({label,to})=>(
+            <NavLink key={to} to={to} className={({isActive})=>
+            isActive ? 'text-white font-medium border-b-2 border-white pb-1'
+          : navigation.link}>{label}</NavLink>
+          ))}
         </nav>
 
     <div className="ml-auto mr-4">

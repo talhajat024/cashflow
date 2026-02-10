@@ -1,12 +1,14 @@
 import { TopBar } from './TopBar';
 import { WelcomeSection } from './WelcomeSection';
 import { HeaderTabs } from './HeaderTabs';
+import { useLocation } from 'react-router-dom';
 
 type DashboardHeaderProps={
   scrolled:boolean;
 }
 
 export const DashboardHeader = ({scrolled}:DashboardHeaderProps) => {
+  const location= useLocation();
   return (
     <header className={`
         sticky top-0 z-50 bg-primary
@@ -17,7 +19,7 @@ export const DashboardHeader = ({scrolled}:DashboardHeaderProps) => {
         <TopBar />
         <div className="pt-3 flex items-center justify-between">
           <WelcomeSection />
-          <HeaderTabs />
+          {location.pathname.startsWith('/dashboard') && <HeaderTabs />}
         </div>
       </div>
     </header>
