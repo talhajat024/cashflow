@@ -15,49 +15,40 @@ export default function DashboardLayout() {
     rangeParams === "weekly" ? "Weekly" : 
     rangeParams === "yearly" ? "Yearly" : "Monthly";
 
-
-    const [headerScrolled,setHeaderScrolled]=useState(false);
   const { data, loading, error } = useDashboardOverview(6);
 
-  // scroll container ref
-  const scrollRef = useRef<HTMLDivElement| null>(null);
-
-  // in memory scroll store (per route)
+  const [headerScrolled,setHeaderScrolled]=useState(false);
   const scrollPositions = useRef<Record<string,number>>({});
 
   // Save scroll position on scroll
     useEffect(()=>
     {
-        const el= scrollRef.current;
-        if(!el) return;
         const handleScroll=()=>{
-            const scrollTop = el.scrollTop;
-            scrollPositions.current[location.pathname]=scrollTop;
-            setHeaderScrolled(scrollTop > 0);
+            const scrollY = window.scrollY;
+            scrollPositions.current[location.pathname]=scrollY;
+            setHeaderScrolled(scrollY > 0);
         };
 
-        el.addEventListener("scroll",handleScroll);
-        return ()=> el.removeEventListener("scroll",handleScroll);
+        window.addEventListener("scroll",handleScroll);
+        return ()=> window.removeEventListener("scroll",handleScroll);
 
     },[location.pathname])
 
     // restrore scroll on route change
     useEffect(()=>
     {
-        const el= scrollRef.current;
-        if(!el) return;
         const saved = scrollPositions.current[location.pathname];
-        el.scrollTop=saved??0;
+        window.scrollTo(0,saved??0);
     },[location.pathname])
 
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <DashboardHeader scrolled={headerScrolled} />
 
-      <div className="flex-1 overflow-y-auto bg-gray-50" ref={scrollRef}>
+      <main className="flex-1 bg-gray-50">
         <div className="bg-primary h-16" />
-        <div className="relative">
+        
           <PageContainer className="-mt-16 relative z-10">
             <Outlet
               context={{
@@ -70,8 +61,8 @@ export default function DashboardLayout() {
               }}
             />
           </PageContainer>
-        </div>
-      </div>
+      
+      </main>
     </div>
   );
 }

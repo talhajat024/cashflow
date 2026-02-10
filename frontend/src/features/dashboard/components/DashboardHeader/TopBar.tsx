@@ -2,6 +2,7 @@ import { Search, Mail, Bell } from 'lucide-react'
 import { Avatar } from '../../../../shared/ui'
 import { CashflowLogo } from '../../../../shared/ui/logo'
 import { Badge } from '../../../../shared/ui/badge/Badge'
+import { Link } from 'react-router-dom'
 
 const layout = {
   inner:
@@ -9,12 +10,12 @@ const layout = {
 }
 
 const brand = {
-  wrapper: 'flex items-center gap-2 text-white relative top-[1px]',
+  wrapper: 'flex items-center gap-2 text-white relative',
   text: 'text-[20px] font-semibold tracking-wide text-slate-50',
 }
 
 const navigation = {
-  wrapper: 'flex h-full items-center gap-8 relative top-[2px]',
+  wrapper: 'flex h-full items-center gap-8 relative top-[1px]',
   link:
     'text-[14px] font-normal text-white/80 hover:text-white transition-colors',
 }
@@ -42,10 +43,10 @@ export const TopBar = () => {
     <section >
       <div className={layout.inner}>
         {/* LEFT — Brand */}
-        <div className={brand.wrapper}>
+        <Link to="/dashboard" className={brand.wrapper} aria-label='Go to dashboard'>
         <CashflowLogo />
         <span className={brand.text}>CashFlow</span>
-        </div>
+        </Link>
 
         {/* CENTER — Navigation */}
         <nav className={navigation.wrapper}>

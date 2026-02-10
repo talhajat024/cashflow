@@ -13,7 +13,7 @@ export const DashboardHeader = ({scrolled}:DashboardHeaderProps) => {
         transition-shadow duration-200
         ${scrolled ? "shadow-lg shadow-black/10" : ""}
       `}>
-      <div className="mx-auto max-w-[1200px] px-8 pb-4">
+      <div className="mx-auto max-w-[1200px] px-8 pb-4 w-full">
         <TopBar />
         <div className="pt-3 flex items-center justify-between">
           <WelcomeSection />
