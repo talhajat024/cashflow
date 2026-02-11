@@ -59,7 +59,7 @@ export const TopBar = () => {
         <nav className={navigation.wrapper} aria-label="Main navigation">
           {NAV_ITEMS.map(({label,to})=>(
             <NavLink key={to} to={to} className={({isActive})=>
-            isActive ? 'text-white font-medium border-b-2 border-white pb-1'
+            isActive ? 'text-white font-normal border-white'
           : navigation.link}>{label}</NavLink>
           ))}
         </nav>

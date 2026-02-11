@@ -1,6 +1,9 @@
     import { Routes,Route, Navigate } from "react-router-dom";
     import { lazy,Suspense } from "react";
     import DashboardLayout from "../features/dashboard/layout/DashboardLayout";
+    import AnalyticsLayout from "../features/analytics/layout/AnalyticsLayout";
+    import TransactionsLayout from "../features/transactions/layout/TransactionsLayout";
+    import WalletsLayout from "../features/wallets/layout/WalletsLayout";
 
     const OverviewPage = lazy(()=> import ("../features/dashboard/pages/OverviewPage"));
     const WalletPage =lazy (()=>import ("../features/dashboard/pages/WalletPage"));
@@ -27,6 +30,18 @@
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="help" element={<HelpPage />} />
                 <Route path="report" element={<ReportPage />} />
+                </Route>
+                
+                <Route path="/analytics" element={<AnalyticsLayout />}>
+                  {/* <Route index element={<AnalyticsOverviewPage />} /> */}
+                </Route>
+
+                <Route path="/transactions" element={<TransactionsLayout />}>
+                  {/* <Route index element={<TransactionsPage />} /> */}
+                </Route>
+
+                <Route path="/wallets" element={<WalletsLayout />}>
+                  {/* <Route index element={<WalletsPage />} /> */}
                 </Route>
             </Routes>
             </Suspense>
