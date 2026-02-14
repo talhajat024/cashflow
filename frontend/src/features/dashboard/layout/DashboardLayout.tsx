@@ -37,9 +37,17 @@ export default function DashboardLayout() {
     // restrore scroll on route change
     useEffect(()=>
     {
+      if(location.state?.scroll === "reset")
+      {
+        window.scrollTo({top:0,behavior:"auto"});
+        window.history.replaceState({},"");
+        console.log("Scroll is reset.");
+        return;
+      }
+
         const saved = scrollPositions.current[location.pathname];
-        window.scrollTo(0,saved??0);
-    },[location.pathname])
+        window.scrollTo({ top: saved ?? 0, behavior: "auto" });
+    },[location.key])
 
 
   return (

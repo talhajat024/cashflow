@@ -3,6 +3,8 @@ import { Avatar } from '../../../../shared/ui'
 import { CashflowLogo } from '../../../../shared/ui/logo'
 import { Badge } from '../../../../shared/ui/badge/Badge'
 import { NavLink,Link } from 'react-router-dom'
+import { useSearch } from '../../../search/hooks/useSearch'
+import { SearchModal } from '../../../search/components/SearchModal'
 
 const layout = {
   inner:
@@ -46,11 +48,15 @@ const NAV_ITEMS=[
 
 
 export const TopBar = () => {
+
+  const {isOpen,open}= useSearch();
+
   return (
+    <>
     <section >
       <div className={layout.inner}>
         {/* LEFT — Brand */}
-        <Link to="/dashboard" className={brand.wrapper} aria-label='Go to dashboard'>
+        <Link to="/dashboard/overview" state={{scroll:"reset"}} className={brand.wrapper} aria-label='Go to dashboard'>
         <CashflowLogo />
         <span className={brand.text}>CashFlow</span>
         </Link>
@@ -70,6 +76,8 @@ export const TopBar = () => {
         <input
           className={search.input}
           placeholder="Search anything..."
+          readOnly
+          onClick={open}
         />
         <Badge intent="searchShortcut">⌘ F</Badge>
       </div>
@@ -92,5 +100,7 @@ export const TopBar = () => {
 
       </div>
     </section>
+    {isOpen && <SearchModal />}
+    </>
   )
 }
