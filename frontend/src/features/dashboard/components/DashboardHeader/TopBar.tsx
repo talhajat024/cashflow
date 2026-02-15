@@ -49,7 +49,7 @@ const NAV_ITEMS=[
 
 export const TopBar = () => {
 
-  const {isOpen,open}= useSearch();
+  const {isOpen,open,close}= useSearch();
 
   return (
     <>
@@ -100,7 +100,7 @@ export const TopBar = () => {
 
       </div>
     </section>
-    {isOpen && <SearchModal />}
+    {isOpen && <SearchModal onClose={close} />}
     </>
   )
 }

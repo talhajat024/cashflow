@@ -58,6 +58,25 @@ export const resultItem = cva([
   "px-4",
   "py-2",
   "text-sm",
-  "hover:bg-gray-100",
   "transition",
+],
+{
+  variants:{
+    active:{
+      true:"bg-gray-100",
+      false:"",
+    },
+  },
+  defaultVariants:{
+    active:false,
+  }
+});
+
+export const section = cva([
+  "px-4",
+  "py-2",
+  "text-[12px]",
+  "font-semibold",
+  "text-gray-400",
+  "uppercase",
 ]);
