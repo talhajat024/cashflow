@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 // import { DashboardHeader } from "../../dashboard/components/DashboardHeader";
 
 export default function WalletsLayout (){
-    console.log("inside wallet page.");
     return(
         <>
          {/* <DashboardHeader /> */}

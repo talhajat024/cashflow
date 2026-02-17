@@ -41,7 +41,6 @@ export default function DashboardLayout() {
       {
         window.scrollTo({top:0,behavior:"auto"});
         window.history.replaceState({},"");
-        console.log("Scroll is reset.");
         return;
       }
 

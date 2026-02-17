@@ -9,6 +9,5 @@ export async function getDashboardOverview(
             balanceRangeInMonths,
         },
     });
-    console.log("The response of dashboard overview api is:",response);
     return response.data;
 }

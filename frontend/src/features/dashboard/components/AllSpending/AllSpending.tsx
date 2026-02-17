@@ -39,12 +39,9 @@ export function AllSpending({
   activeRange,
   onRangeChange,
 }: AllSpendingProps) {
-  console.log("The data is:",data);
   const { byRange,currency, summary } = data;
 
   const chart = byRange[activeRange];
-  console.log("chart is:",chart);
-  console.log("The active range is:",activeRange)
 
   return (
     <Card className={wrapper()}>

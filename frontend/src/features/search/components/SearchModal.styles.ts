@@ -63,6 +63,12 @@ export const resultItem = cva(
     "text-sm",
     "transition",
     "gap-2",
+
+    "focus:outline-none",
+    "focus:ring-2",
+    "focus:ring-blue-500",
+    "focus:ring-offset-2",
+    "focus:ring-offset-white",
   ],
   {
     variants: {

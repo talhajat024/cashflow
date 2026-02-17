@@ -4,8 +4,6 @@ import { getDashboardOverview } from "../../features/dashboard/api/dashboard.api
 
 export function useDashboardOverview(balanceRangeInMonths:number){
 
-    console.log("Inside UseDashboardOverview");
-
     const [data,setData]=useState<DashboardOverview | null>(null);
     const [loading,setLoading]=useState(true);
     const [error,setError]= useState<string | null>(null);
