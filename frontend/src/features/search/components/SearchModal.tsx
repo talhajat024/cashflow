@@ -23,7 +23,7 @@ const resultIcons: Record<string, any> = {
 };
 
 export function SearchModal({ onClose }: Props) {
-  const { query, setQuery, close, results } = useSearch();
+  const { query, setQuery, results } = useSearch();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const navigate = useNavigate();
@@ -43,6 +43,12 @@ export function SearchModal({ onClose }: Props) {
     setActiveIndex(0);
   }, [query]);
 
+  useEffect(() => {
+  if (activeIndex >= results.length) {
+    setActiveIndex(0);
+  }
+}, [results, activeIndex]);
+
   // Keyboard handling
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -52,16 +58,16 @@ export function SearchModal({ onClose }: Props) {
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
+        setActiveIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0));
       }
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : results.length-1));
       }
       if (e.key === "Enter") {
         if (results[activeIndex]) {
           navigate(results[activeIndex].path);
-          close();
+          onClose();
         }
       }
     };
@@ -81,22 +87,6 @@ export function SearchModal({ onClose }: Props) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-      useEffect(() => {
-    const container = resultsContainerRef.current;
-    const activeItem = itemRefs.current[activeIndex];
-
-    if (!container || !activeItem) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const itemRect = activeItem.getBoundingClientRect();
-
-    if (itemRect.top < containerRect.top) {
-      activeItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else if (itemRect.bottom > containerRect.bottom) {
-      activeItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }, [activeIndex]);
-
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
       if (e.shiftKey) {
@@ -114,6 +104,24 @@ export function SearchModal({ onClose }: Props) {
     modal.addEventListener("keydown", handleTab);
     return () => modal.removeEventListener("keydown", handleTab);
   }, []);
+
+  
+      useEffect(() => {
+    const container = resultsContainerRef.current;
+    const activeItem = itemRefs.current[activeIndex];
+
+    if (!container || !activeItem) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const itemRect = activeItem.getBoundingClientRect();
+
+    if (itemRect.top < containerRect.top) {
+      activeItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else if (itemRect.bottom > containerRect.bottom) {
+      activeItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [activeIndex,results]);
+
 
   const groupedResults = results.reduce(
     (acc, item) => {
@@ -167,7 +175,7 @@ export function SearchModal({ onClose }: Props) {
                       onFocus={() => setActiveIndex(globalIndex)}
                       onClick={() => {
                         navigate(item.path);
-                        close();
+                        onClose();
                       }}
                       className={styles.resultItem({ active: isActive })}
                     >

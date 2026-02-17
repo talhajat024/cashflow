@@ -5,7 +5,7 @@ import { Badge } from '../../../../shared/ui/badge/Badge'
 import { NavLink,Link } from 'react-router-dom'
 import { useSearch } from '../../../search/hooks/useSearch'
 import { SearchModal } from '../../../search/components/SearchModal'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 const layout = {
   inner:
@@ -51,6 +51,15 @@ const NAV_ITEMS=[
 export const TopBar = () => {
 
   const {isOpen,open,close}= useSearch();
+  const searchTriggerRef= useRef<HTMLInputElement>(null);
+
+ useEffect(() => {
+  if (!isOpen) {
+    setTimeout(() => {
+      searchTriggerRef.current?.focus();
+    }, 0);
+  }
+}, [isOpen]);
 
   useEffect(()=>{
     const handleShortcut= (e:KeyboardEvent)=>{
@@ -91,6 +100,7 @@ export const TopBar = () => {
       <div className={search.wrapper}>
         <Search className={search.icon} />
         <input
+        ref={searchTriggerRef}
           className={search.input}
           placeholder="Search anything..."
           readOnly
@@ -117,7 +127,7 @@ export const TopBar = () => {
 
       </div>
     </section>
-    {isOpen && <SearchModal onClose={close} />}
+    {isOpen && <SearchModal onClose={close}  />}
     </>
   )
 }

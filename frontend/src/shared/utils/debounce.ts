@@ -6,8 +6,17 @@ export function debounceFn<F extends (...args: any[]) => void>(
 ): (...args: Parameters<F>) => void {
   let timeoutId: ReturnType<typeof setTimeout>;
 
-  return (...args: Parameters<F>) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(...args), delay);
+  const debounced = (...args:Parameters<F>)=>{
+    if(timeoutId) clearTimeout(timeoutId);
+    timeoutId= setTimeout(() => func(...args), delay);
+  }
+
+  // cancel for cleanup
+  debounced.cancel = ()=>{
+    if(timeoutId)
+    {
+        clearTimeout(timeoutId);
+    }
   };
+  return debounced;
 }
