@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card,CardHeader,CardContent } from "../../../shared/ui";
 import { useSearch } from "../hooks/useSearch";
 import * as styles from './SearchModal.styles'
+import { LayoutDashboard,Wallet,Receipt, BarChart3 } from "lucide-react";
 
 interface Props{
     onClose:()=> void;
@@ -14,6 +15,13 @@ const groupLabels:Record<string,string>={
     transaction:"Transactions",
 }
 
+const resultIcons:Record<string,any>={
+    dashboard:LayoutDashboard,
+    analytics:BarChart3,
+    wallets:Wallet,
+    transactions:Receipt,
+};
+
 export function SearchModal({onClose}:Props)
 {
     const {query,setQuery,close,results}= useSearch();
@@ -21,6 +29,8 @@ export function SearchModal({onClose}:Props)
 
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const modalRef= useRef<HTMLDivElement>(null);
 
     // Autofocus input
     useEffect(()=> {
@@ -33,41 +43,71 @@ export function SearchModal({onClose}:Props)
     },[query])
 
     // Keyboard handling
-        useEffect(()=>{
+    useEffect(()=>{
+        const handleKey= (e:KeyboardEvent)=>{
+        if(e.key === 'Escape') {
+            onClose();
+            return;
+        }
+        if(e.key === "ArrowDown")
+        {
+            e.preventDefault();
+            setActiveIndex((prev)=>
+            prev< results.length -1 ? prev +1  :prev);
+        }
+        if(e.key === "ArrowUp")
+        {
+            e.preventDefault();
+            setActiveIndex((prev)=> 
+            prev > 0 ? prev -1 :prev);
+        }
+        if(e.key === "Enter")
+        {
+            if(results[activeIndex])
+            {
+                navigate(results[activeIndex].path);
+                close();
+            }
+        }
+        }
+        window.addEventListener("keydown",handleKey);
+        return ()=> window.removeEventListener("keydown",handleKey);
+    },[results,activeIndex,navigate,close,onClose])  
 
-            const handleKey= (e:KeyboardEvent)=>{
-            if(e.key === 'Escape') {
-                onClose();
-                return;
-            }
-            if(e.key === "ArrowDown")
-            {
-                e.preventDefault();
-                setActiveIndex((prev)=>
-                prev< results.length -1 ? prev +1  :prev);
-            }
-            if(e.key === "ArrowUp")
-            {
-                e.preventDefault();
-                setActiveIndex((prev)=> 
-                prev > 0 ? prev -1 :prev);
-            }
+    useEffect(()=>{
+        const modal= modalRef.current;
+        if(!modal) return;
+ 
+        const focusableSelectors ='button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])';
+        const focusableElements= modal.querySelectorAll<HTMLElement>(focusableSelectors);
+        if(focusableElements.length === 0) return;
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length -1];
 
-            if(e.key === "Enter")
-            {
-                if(results[activeIndex])
+        const handleTab = (e:KeyboardEvent)=>{
+            if(e.key !== "Tab") return;
+            if(e.shiftKey){
+                if(document.activeElement === firstElement)
                 {
-                    navigate(results[activeIndex].path);
-                    close();
+                    e.preventDefault();
+                    lastElement.focus();
                 }
             }
+            else{
+                if(document.activeElement === lastElement)
+                {
+                    e.preventDefault();
+                    firstElement.focus();
+                }
             }
-            window.addEventListener("keydown",handleKey);
-            return ()=> window.removeEventListener("keydown",handleKey);
-        },[results,activeIndex,navigate,close,onClose])  
+        };
+        modal.addEventListener("keydown",handleTab);
+        return ()=> modal.removeEventListener("keydown",handleTab);
+    },[])
 
         const groupedResults = results.reduce((acc,item)=>{
-            console.log("the acc is:",acc, " the current item is:",item);
+            console.log("Results are:",results);
+            console.log("the acc is:",JSON.parse(JSON.stringify(acc)));
             if(!acc[item.type])
             {
                 acc[item.type] = [];
@@ -78,7 +118,7 @@ export function SearchModal({onClose}:Props)
 
     return(
         <div className={styles.overlay()}>
-            <Card className={styles.modal()}>
+            <Card ref={modalRef} className={styles.modal()}>
                 <CardHeader>
                     <div className={styles.header()}>
                         <input 
@@ -108,6 +148,7 @@ export function SearchModal({onClose}:Props)
                 {items.map((item) => {
                   globalIndex += 1;
                   const isActive = globalIndex === activeIndex;
+                  const Icon= resultIcons[item.id];
                 
                   return (
                     <button
@@ -118,6 +159,7 @@ export function SearchModal({onClose}:Props)
                       }}
                       className={styles.resultItem({ active: isActive })}
                     >
+                    {Icon && <Icon size={16} className="mr-3 text-gray-500"/>}
                       {item.label}
                     </button>
                   );

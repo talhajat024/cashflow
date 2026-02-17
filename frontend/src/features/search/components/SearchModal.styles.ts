@@ -52,25 +52,30 @@ export const emptyState = cva([
   "text-gray-500",
 ]);
 
-export const resultItem = cva([
-  "w-full",
-  "text-left",
-  "px-4",
-  "py-2",
-  "text-sm",
-  "transition",
-],
-{
-  variants:{
-    active:{
-      true:"bg-gray-100",
-      false:"",
+export const resultItem = cva(
+  [
+    "w-full",
+    "flex",
+    "items-center",
+    "text-left",
+    "px-4",
+    "py-2",
+    "text-sm",
+    "transition",
+    "gap-2",
+  ],
+  {
+    variants: {
+      active: {
+        true: "bg-gray-100",
+        false: "",
+      },
     },
-  },
-  defaultVariants:{
-    active:false,
+    defaultVariants: {
+      active: false,
+    },
   }
-});
+);
 
 export const section = cva([
   "px-4",

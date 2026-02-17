@@ -5,6 +5,7 @@ import { Badge } from '../../../../shared/ui/badge/Badge'
 import { NavLink,Link } from 'react-router-dom'
 import { useSearch } from '../../../search/hooks/useSearch'
 import { SearchModal } from '../../../search/components/SearchModal'
+import { useEffect } from 'react'
 
 const layout = {
   inner:
@@ -50,6 +51,22 @@ const NAV_ITEMS=[
 export const TopBar = () => {
 
   const {isOpen,open,close}= useSearch();
+
+  useEffect(()=>{
+    const handleShortcut= (e:KeyboardEvent)=>{
+      const isMac= navigator.platform.toUpperCase().includes("MAC");
+      if(
+        (isMac && e.metaKey && e.key.toLowerCase() === "k") || 
+        (!isMac && e.ctrlKey && e.key.toLowerCase() === "k"))
+        {
+          e.preventDefault();
+          open();
+        }
+    };
+
+    window.addEventListener("keydown",handleShortcut);
+    return ()=> window.removeEventListener("keydown",handleShortcut);
+  },[open])
 
   return (
     <>
