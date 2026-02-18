@@ -151,7 +151,7 @@ export function SearchModal({ onClose }: Props) {
 
         <CardContent ref={resultsContainerRef} className={styles.results()}>
           {results.length === 0 && query && (
-            <p className={styles.emptyState()}>No Results Found</p>
+            <p className={styles.emptyState()}>No results. Try searching for pages, wallets, or transactions.</p>
           )}
           {(() => {
             itemRefs.current = [];

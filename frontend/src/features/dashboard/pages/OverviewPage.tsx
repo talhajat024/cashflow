@@ -1,4 +1,5 @@
 import { useOutletContext } from "react-router-dom";
+import { PageState } from "../../../shared/ui/pagestate/PageState";
 import type { TimeRange,DashboardOverview } from "../types/dashboard.types";
 
 import { OverviewStats } from "../components/OverviewStats";
@@ -21,13 +22,17 @@ export default function OverviewPage() {
   }
 
   return (
-    <>
-      {/* page-level loading indicator */}
-      {loading && (
-        <div className="text-sm text-gray-400 mb-2">
-          Updating dashboard...
-        </div>
-      )}
+    <PageState
+    loading={loading}
+    loadingLayout="dashboard"
+    error={error}
+    onRetry={()=> window.location.reload()}
+    isEmpty={!data}
+    emptyTitle="No Overview Data"
+    emptyDescription="Start adding transactions to see your financial overview"
+      emptyActionLabel="Add Transaction"
+      onEmptyAction={() => window.location.href = '/transactions/new'}>
+
 
       {data && (
         <div className="flex flex-col gap-6">
@@ -43,6 +48,6 @@ export default function OverviewPage() {
           <RecentTransactions transactions={data.recentTransactions} />
         </div>
       )}
-    </>
+    </PageState>
   );
 }

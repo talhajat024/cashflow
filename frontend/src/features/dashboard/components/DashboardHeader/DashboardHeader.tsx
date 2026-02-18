@@ -4,7 +4,7 @@ import { HeaderTabs } from './HeaderTabs';
 import { useLocation } from 'react-router-dom';
 
 type DashboardHeaderProps={
-  scrolled:boolean;
+  scrolled?:boolean;
 }
 
 export const DashboardHeader = ({scrolled}:DashboardHeaderProps) => {
