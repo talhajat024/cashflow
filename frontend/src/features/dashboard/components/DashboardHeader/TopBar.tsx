@@ -6,6 +6,7 @@ import { NavLink,Link } from 'react-router-dom'
 import { useSearch } from '../../../search/hooks/useSearch'
 import { SearchModal } from '../../../search/components/SearchModal'
 import { useEffect, useRef } from 'react'
+import InboxDropdown from './InboxDropdown'
 
 const layout = {
   inner:
@@ -110,12 +111,16 @@ export const TopBar = () => {
       </div>
     </div>
 
-    {/* ACTIONS — independent */}
     <div className={actions.iconGroup}>
-      <div className={actions.iconButton}>
-        <Mail className="h-5 w-5" />
-        <span className={actions.dot} />
-      </div>
+      <InboxDropdown
+      trigger={
+         <div className={actions.iconButton}>
+      <Mail className="h-5 w-5" />
+      <span className={actions.dot} />
+    </div>
+      }>
+    </InboxDropdown>
+
 
       <div className={actions.iconButton}>
         <Bell className="h-5 w-5" />

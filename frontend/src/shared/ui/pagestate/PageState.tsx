@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { EmptyState } from "./EmptyState";
 import { ErrorState } from "./ErrorState";
-import { PageSkeleton } from "../skeleton/PageSkeleton";
+import { PageSkeleton } from "../pageskeleton/PageSkeleton";
 
 
 interface PageStateProps{

@@ -5,6 +5,7 @@ import type { TimeRange,DashboardOverview } from "../types/dashboard.types";
 import { OverviewStats } from "../components/OverviewStats";
 import { RecentTransactions } from "../components/RecentTransactions/RecentTransactions";
 import { DashboardInsights } from "../components/DashboardInsights/DashboardInsights";
+import { PageSkeleton } from "../../../shared/ui/pageskeleton";
 
 type DashboardContext = {
   data:DashboardOverview | null;
@@ -19,6 +20,10 @@ export default function OverviewPage() {
 
   if (error) {
     return <div>{error}</div>;
+  }
+
+   if (loading) {
+    return <PageSkeleton layout="dashboard" />;
   }
 
   return (

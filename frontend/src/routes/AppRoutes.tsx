@@ -7,7 +7,7 @@ import TransactionsLayout from "../features/transactions/layout/TransactionsLayo
 import WalletsLayout from "../features/wallets/layout/WalletsLayout";
 
 // Import your skeleton
-import { PageSkeleton } from "../shared/ui/skeleton/PageSkeleton";
+import { PageSkeleton } from "../shared/ui/pageskeleton/PageSkeleton";
 
 const OverviewPage = lazy(() => import("../features/dashboard/pages/OverviewPage"));
 const WalletPage = lazy(() => import("../features/dashboard/pages/WalletPage"));
