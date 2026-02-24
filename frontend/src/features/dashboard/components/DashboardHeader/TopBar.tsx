@@ -5,7 +5,9 @@ import { Badge } from '../../../../shared/ui/badge/Badge'
 import { NavLink,Link } from 'react-router-dom'
 import { useSearch } from '../../../search/hooks/useSearch'
 import { SearchModal } from '../../../search/components/SearchModal'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef ,useState} from 'react'
+import { NotificationsPanel } from '../../../notifications/components/NotificationsPanel';
+import { useNotifications } from '../../../notifications/hooks/useNotifications'
 import InboxDropdown from './InboxDropdown'
 
 const layout = {
@@ -38,6 +40,7 @@ const actions = {
     'relative flex items-center justify-center text-white/90 hover:text-white transition',
   dot:
     'absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500',
+    badge: 'absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white bg-red-500 rounded-full',
 }
 
 const NAV_ITEMS=[
@@ -53,6 +56,9 @@ export const TopBar = () => {
 
   const {isOpen,open,close}= useSearch();
   const searchTriggerRef= useRef<HTMLInputElement>(null);
+
+   const [showNotifications,setShowNotifications]=useState(false);
+    const { unreadCount } = useNotifications();
 
  useEffect(() => {
   if (!isOpen) {
@@ -122,10 +128,32 @@ export const TopBar = () => {
     </InboxDropdown>
 
 
-      <div className={actions.iconButton}>
-        <Bell className="h-5 w-5" />
-        <span className={actions.dot} />
-      </div>
+       <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={actions.iconButton}
+              >
+                <Bell className="h-5 w-5" />
+                {/* Show dot if there are unread notifications (fallback) */}
+                {unreadCount > 0 && (
+                  <>
+                    {/* Show counter if more than 0, otherwise just dot */}
+                    {unreadCount > 0 ? (
+                      <span className={actions.badge}>
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    ) : (
+                      <span className={actions.dot} />
+                    )}
+                  </>
+                )}
+              </button>
+
+              {/* Notifications Panel */}
+              {showNotifications && (
+                <NotificationsPanel onClose={() => setShowNotifications(false)} />
+              )}
+            </div>
 
    <Avatar src="/avatar.jpg" />
     </div>
