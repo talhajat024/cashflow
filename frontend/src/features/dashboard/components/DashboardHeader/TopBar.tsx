@@ -36,11 +36,16 @@ const search = {
 
 const actions = {
   iconGroup: 'flex items-center gap-6',
-  iconButton:
-    'relative flex items-center justify-center text-white/90 hover:text-white transition',
-  dot:
-    'absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500',
-    badge: 'absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white bg-red-500 rounded-full',
+  iconButton: 'relative flex items-center justify-center text-white/90 hover:text-white transition p-1', 
+  dot: 'absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500',
+  badge: `
+    absolute -top-1 -right-1 
+    min-w-[18px] h-[18px] 
+    flex items-center justify-center
+    px-1 text-xs font-bold text-white 
+    bg-red-500 rounded-full
+    shadow-lg border-2 border-white
+  `,
 }
 
 const NAV_ITEMS=[
@@ -134,10 +139,8 @@ export const TopBar = () => {
                 className={actions.iconButton}
               >
                 <Bell className="h-5 w-5" />
-                {/* Show dot if there are unread notifications (fallback) */}
                 {unreadCount > 0 && (
                   <>
-                    {/* Show counter if more than 0, otherwise just dot */}
                     {unreadCount > 0 ? (
                       <span className={actions.badge}>
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -149,7 +152,6 @@ export const TopBar = () => {
                 )}
               </button>
 
-              {/* Notifications Panel */}
               {showNotifications && (
                 <NotificationsPanel onClose={() => setShowNotifications(false)} />
               )}
