@@ -2,6 +2,7 @@ import { Card,CardHeader,CardContent } from "../../../../shared/ui";
 import { BalanceChart } from "./BalanceChart";
 import { TimeRangeSelect } from "../../../../shared/ui/filters";
 import type { BalanceOverviewChart as  BalanceChartDto } from "../../types/dashboard.types";
+import type { TimeRange } from "../../../../shared/ui/filters/TimeRangeSelect";
 
 import {
     header,
@@ -15,9 +16,11 @@ import {
 type BalanceOverviewProps = {
     title:string;
     chart:BalanceChartDto;
+    range:TimeRange;
+    onRangeChange:(range:TimeRange)=> void;
 };
 
-export function BalanceOverview({title, chart }:BalanceOverviewProps){
+export function BalanceOverview({title, chart,range,onRangeChange }:BalanceOverviewProps){
     return(
         <Card>
             <CardHeader className={header()}>
@@ -32,7 +35,10 @@ export function BalanceOverview({title, chart }:BalanceOverviewProps){
          ))}
             </div>
                 </div>
-                <TimeRangeSelect label={`Last ${chart.rangeInMonths} months`} />
+                <TimeRangeSelect 
+                    value={range}
+                    onChange={onRangeChange}
+                />
             </CardHeader>
 
             <CardContent>

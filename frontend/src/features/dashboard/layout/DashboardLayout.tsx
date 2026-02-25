@@ -15,7 +15,10 @@ export default function DashboardLayout() {
     rangeParams === "weekly" ? "Weekly" : 
     rangeParams === "yearly" ? "Yearly" : "Monthly";
 
-  const { data, loading, error } = useDashboardOverview(6);
+  const balanceParam= searchParams.get("balance");
+  const balanceRange= balanceParam && ['3','6','12','24'].includes(balanceParam) ? parseInt(balanceParam,10) : 6;
+
+  const { data, loading, error } = useDashboardOverview(balanceRange);
 
   const [headerScrolled,setHeaderScrolled]=useState(false);
   const scrollPositions = useRef<Record<string,number>>({});
@@ -49,6 +52,13 @@ export default function DashboardLayout() {
     },[location.key])
 
 
+    const handleBalanceRangeChange=(range:string)=>{
+      const newParams=new URLSearchParams(searchParams);
+      newParams.set("balance",range);
+      setSearchParams(newParams);
+    }
+
+
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardHeader scrolled={headerScrolled} />
@@ -62,13 +72,14 @@ export default function DashboardLayout() {
                 data,
                 loading,
                 error,
+                balanceRange:balanceRange.toString(),
+                onBalanceRangeChange:handleBalanceRangeChange,
                 spendingRange,
                 setSpendingRange: (range: TimeRange) =>
-                  setSearchParams({ range: range.toLowerCase() }),
+                  setSearchParams({ range: range.toLowerCase() })
               }}
             />
           </PageContainer>
-      
       </main>
     </div>
   );

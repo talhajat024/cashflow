@@ -11,12 +11,16 @@ type DashboardContext = {
   data:DashboardOverview | null;
   loading:boolean;
   error:string | null;
+
+  balanceRange:string;
+  onBalanceRangeChange:(range:string)=>void;
+
   spendingRange: TimeRange;
   setSpendingRange:(range:TimeRange)=>void;
 }
 
 export default function OverviewPage() {
-  const { data, loading, error,spendingRange,setSpendingRange } = useOutletContext<DashboardContext>();
+  const { data, loading, error,balanceRange,onBalanceRangeChange,spendingRange,setSpendingRange } = useOutletContext<DashboardContext>();
 
   if (error) {
     return <div>{error}</div>;
@@ -48,6 +52,8 @@ export default function OverviewPage() {
             allSpending={data.allSpending}
             activeRange={spendingRange}
             onSpendingRangeChange={setSpendingRange}
+            balanceRange={balanceRange}
+            onBalanceRangeChange={onBalanceRangeChange}
           />
 
           <RecentTransactions transactions={data.recentTransactions} />

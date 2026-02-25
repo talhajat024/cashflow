@@ -8,7 +8,8 @@ import { SearchModal } from '../../../search/components/SearchModal'
 import { useEffect, useRef ,useState} from 'react'
 import { NotificationsPanel } from '../../../notifications/components/NotificationsPanel';
 import { useNotifications } from '../../../notifications/hooks/useNotifications'
-import InboxDropdown from './InboxDropdown'
+import InboxDropdown from './InboxDropdown';
+import { UserMenu } from '../../../user/components/UserMenu/UserMenu'
 
 const layout = {
   inner:
@@ -62,8 +63,26 @@ export const TopBar = () => {
   const {isOpen,open,close}= useSearch();
   const searchTriggerRef= useRef<HTMLInputElement>(null);
 
-   const [showNotifications,setShowNotifications]=useState(false);
-    const { unreadCount } = useNotifications();
+  const [showNotifications,setShowNotifications]=useState(false);
+  const { unreadCount } = useNotifications();
+    
+  const notificationsRef=useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    const handleClickOutside=(event:MouseEvent)=>{
+      if(notificationsRef.current && !notificationsRef.current.contains(event.target as Node))
+      {
+        setShowNotifications(false);
+      }
+    }
+      if(showNotifications)
+      {
+        document.addEventListener('mousedown',handleClickOutside);
+      }
+      return ()=>{
+        document.removeEventListener('mousedown',handleClickOutside);
+    };
+  },[showNotifications])
 
  useEffect(() => {
   if (!isOpen) {
@@ -133,7 +152,7 @@ export const TopBar = () => {
     </InboxDropdown>
 
 
-       <div className="relative">
+       <div className="relative" ref={notificationsRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className={actions.iconButton}
@@ -157,7 +176,7 @@ export const TopBar = () => {
               )}
             </div>
 
-   <Avatar src="/avatar.jpg" />
+   <UserMenu/>
     </div>
 
       </div>

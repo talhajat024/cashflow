@@ -7,20 +7,26 @@ interface DashboardInsightProps{
     allSpending:AllSpendingType;
     activeRange:TimeRange;
     onSpendingRangeChange:(range:TimeRange)=>void;
+    balanceRange:string;
+    onBalanceRangeChange:(range:string)=> void;
 }
 
 export function DashboardInsights({
     balanceChart,
     allSpending,
     activeRange,
-    onSpendingRangeChange
+    onSpendingRangeChange,
+    balanceRange,
+    onBalanceRangeChange,
 }:DashboardInsightProps)
 {
     return(
         <div className="grid grid-cols-3 gap-6">
             <div className="col-span-2">
                 <BalanceOverview title="Balance Overview"
-               chart={balanceChart}/>
+               chart={balanceChart}
+               range={balanceRange as '3' | '6' | '12' | '24'}
+        onRangeChange={onBalanceRangeChange}/>
             </div>
             <div className="col-span-1">
                 <AllSpending
