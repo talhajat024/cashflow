@@ -58,6 +58,12 @@ export default function DashboardLayout() {
       setSearchParams(newParams);
     }
 
+    const handleSpendingRangeChange=(range:TimeRange)=>{
+      const newParams= new URLSearchParams(searchParams);
+      newParams.set("range",range.toLowerCase());
+      setSearchParams(newParams);
+    }
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -75,8 +81,7 @@ export default function DashboardLayout() {
                 balanceRange:balanceRange.toString(),
                 onBalanceRangeChange:handleBalanceRangeChange,
                 spendingRange,
-                setSpendingRange: (range: TimeRange) =>
-                  setSearchParams({ range: range.toLowerCase() })
+                setSpendingRange:handleSpendingRangeChange,
               }}
             />
           </PageContainer>
