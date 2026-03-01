@@ -3,10 +3,12 @@ import type { User } from "../../features/user/types/user.types";
 let userData:User |null=null;
 
 export const tokenStorage = {
-    setTokens:(accessTokens:string, refreshToken:string)=>{
-        if(!document.cookie.includes('XSRF-TOKEN=')){
-            console.warn('CSRF token not found in cookies');
-        }
+    setTokens: (accessToken: string, refreshToken: string) => {
+      if (!document.cookie.includes('XSRF-TOKEN=')) {
+        console.warn('CSRF token not found - server may not have set it');
+      } else {
+        console.log('Auth tokens set via HttpOnly cookies');
+      }
     },
     getAccessToken:():null=>{
         console.warn('Access tokens are HttpOnly - cannot access from JS');
@@ -52,17 +54,22 @@ export const tokenStorage = {
         sessionStorage.removeItem('user');
         console.log("User data cleared.");
     },
-    hasTokens:():boolean=>{
-        const hasCsrfToken=document.cookie.includes('XSRF-TOKEN=');
-        const hasUserData= !!tokenStorage.getUser();
+    hasTokens: (): boolean => {
+    const hasCsrfToken = document.cookie.includes('XSRF-TOKEN=');
+    const hasUserData = !!tokenStorage.getUser();
+    
+    if (hasCsrfToken && !hasUserData) {
+      console.warn('Inconsistent auth state — clearing');
+      tokenStorage.clearTokens();
+      return false;
+    }
 
-        if(hasCsrfToken && !hasUserData)
-        {
-            console.warn("Inconsistent auth state: CSRF token present but no user data");
-            return false;
-        }
-
-        return hasCsrfToken;
+    if (!hasCsrfToken && hasUserData) {
+      console.warn('User data without CSRF token — clearing');
+      tokenStorage.clearTokens();
+      return false;
+    }
+    return hasCsrfToken && hasUserData;
     },
     getAuthState:()=>{
         return{

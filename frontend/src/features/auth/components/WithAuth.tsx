@@ -25,20 +25,20 @@ export const withAuth = <P extends object>(
                 );
             }
 
-            if(requireAuth && !isAuthenticated)
-            {
-                return <Navigate to={redirectTo} replace/>;
-            }
-
-            if(isAuthenticated && requiredRole && !hasRole?.(requiredRole))
-            {
-                return <Navigate to='/unauthorized' replace/>
-            }
-
-            if(!requireAuth && isAuthenticated)
-            {
-                return <Navigate to="/dashboard/overview" replace/>
-            }
+             
+              if (requireAuth && !isAuthenticated) {
+                return <Navigate to={redirectTo} replace />;
+              }
+          
+             
+              if (requireAuth && isAuthenticated && requiredRole && !hasRole?.(requiredRole)) {
+                return <Navigate to="/unauthorized" replace />;
+              }
+          
+              
+              if (!requireAuth && isAuthenticated) {
+                return <Navigate to="/dashboard/overview" replace />;
+              }
             return <Component {...props}/>
             }
 }
