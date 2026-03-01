@@ -3,14 +3,22 @@ export interface User
     id:string;
     name:string;
     email:string;
+    role:'user' | 'admin';
     avatar?:string;
     initials:string;
-    role?:'admin' | 'user' | 'manager';
     createdAt?:string;
     lastLogin?:string;
 }
 
-export interface UserMenuProps
+export interface UserMenuState
 {
-    className?:string;
+    isOpen?:boolean;
+}
+
+export interface UserContextType{
+    user:User | null;
+    loading :boolean;
+    error?:string | null;
+    signOut:()=> Promise<void>;
+    refreshUser?:()=> Promise<User>;
 }

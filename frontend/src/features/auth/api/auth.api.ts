@@ -1,6 +1,7 @@
 // features/auth/api/auth.api.ts
 import { httpClient, refreshCsrfToken } from '../../../shared/api/httpClient';
-import type { LoginCredentials, SignupData, AuthResponse, User } from '../types/auth.types';
+import type { LoginCredentials, SignupData, AuthResponse } from '../types/auth.types';
+import type { User } from '../../user/types/user.types';
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {

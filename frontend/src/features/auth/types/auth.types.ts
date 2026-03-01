@@ -1,3 +1,4 @@
+import type { User } from "../../user/types/user.types";
 export interface LoginCredentials{
     email:string;
     password:string;
@@ -16,19 +17,24 @@ export interface AuthResponse{
     user:User;
 }
 
-export interface User{
-    id:string;
-    name:string;
-    email:string;
-    role:'user' | 'admin';
-    avatar?:string;
-    createdAt:string;
-}
+// export interface TokenPayload{
+//     sub:string;
+//     email:string;
+//     role:'user' | 'admin';
+//     exp:number;
+//     iat:number;
+// }
 
-export interface TokenPayload{
-    sub:string;
-    email:string;
-    role:string;
-    exp:number;
-    iat:number;
+
+export interface AuthContextType{
+    user:User|null;
+    isLoading:boolean;
+    error:string | null;
+    isAuthenticated:boolean;
+    login:(credentials:LoginCredentials)=> Promise<void>;
+    signup:(data:SignupData)=> Promise<void>;
+    logout:() => Promise<void>;
+     refreshUser: () => Promise<User>;
+     forceRefreshToken?: () => Promise<void>;
+     hasRole?: (role: string) => boolean;
 }
