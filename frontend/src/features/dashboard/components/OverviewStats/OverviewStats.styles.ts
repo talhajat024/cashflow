@@ -3,7 +3,6 @@ import { tv } from "tailwind-variants";
 export const statsWrapper = tv({
   base: `
     relative
-    -mt-16
     z-10
     w-full
   `,

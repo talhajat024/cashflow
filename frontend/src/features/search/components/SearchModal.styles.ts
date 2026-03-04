@@ -1,0 +1,93 @@
+import { cva } from "class-variance-authority";
+
+/* Overlay */
+
+export const overlay = cva([
+  "fixed",
+  "inset-0",
+  "z-50",
+  "bg-black/40",
+  "flex",
+  "items-start",
+  "justify-center",
+  "pt-24",
+]);
+
+/* Modal container (Card wrapper) */
+
+export const modal = cva([
+  "w-full",
+  "max-w-xl",
+]);
+
+/* Header */
+
+export const header = cva([
+  "flex",
+  "items-center",
+  "gap-2",
+]);
+
+export const input = cva([
+  "w-full",
+  "text-sm",
+  "outline-none",
+  "bg-transparent",
+  "placeholder-gray-400",
+]);
+
+/* Results */
+
+export const results = cva([
+  "flex",
+  "flex-col",
+  "max-h-[320px]",
+  "overflow-y-auto",
+]);
+
+export const emptyState = cva([
+  "px-4",
+  "py-3",
+  "text-sm",
+  "text-gray-500",
+]);
+
+export const resultItem = cva(
+  [
+    "w-full",
+    "flex",
+    "items-center",
+    "text-left",
+    "px-4",
+    "py-2",
+    "text-sm",
+    "transition",
+    "gap-2",
+
+    "focus:outline-none",
+    "focus:ring-2",
+    "focus:ring-blue-500",
+    "focus:ring-offset-2",
+    "focus:ring-offset-white",
+  ],
+  {
+    variants: {
+      active: {
+        true: "bg-gray-100",
+        false: "",
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  }
+);
+
+export const section = cva([
+  "px-4",
+  "py-2",
+  "text-[12px]",
+  "font-semibold",
+  "text-gray-400",
+  "uppercase",
+]);

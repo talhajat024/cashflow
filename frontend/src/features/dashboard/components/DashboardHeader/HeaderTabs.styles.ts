@@ -33,14 +33,14 @@ export const tabItem = tv({
 export const tabUnderline = tv({
   base: `
     absolute
-    left-0
-    -bottom-[1px]
+    bottom-0
     h-[2px]
-    w-full
     bg-white
     rounded-full
-    origin-left
-    animate-tab-underline
+    transition-transform
+    transition-width
+    duration-300
+    ease-out
     z-20
   `,
 });

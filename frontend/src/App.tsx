@@ -1,15 +1,15 @@
-// import AppRoutes from "./routes/AppRoutes"
-// import { BrowserRouter } from "react-router-dom";
-import DashboardPage from "./features/dashboard/pages/DashboardPage"
+import AppRoutes from "./routes/AppRoutes"
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./features/auth";
 
 function App() {
 
   return (
-    // <BrowserRouter>
-    // <AppRoutes/>
-    // </BrowserRouter>
-
-    <DashboardPage />
+    <BrowserRouter>
+    <AuthProvider>
+       <AppRoutes/>
+    </AuthProvider>
+    </BrowserRouter>
   )
 }
 
