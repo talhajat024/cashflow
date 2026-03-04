@@ -1,20 +1,33 @@
 import { BalanceOverview } from "../BalanceOverview/BalanceOverview";
 import { AllSpending } from "../AllSpending/AllSpending";
+import type { BalanceOverviewChart,AllSpending as AllSpendingType,TimeRange } from "../../types/dashboard.types";
 
-export function DashboardInsights()
+interface DashboardInsightProps{
+    balanceChart:BalanceOverviewChart;
+    allSpending:AllSpendingType;
+    activeRange:TimeRange;
+    onSpendingRangeChange:(range:TimeRange)=>void;
+}
+
+export function DashboardInsights({
+    balanceChart,
+    allSpending,
+    activeRange,
+    onSpendingRangeChange
+}:DashboardInsightProps)
 {
     return(
         <div className="grid grid-cols-3 gap-6">
             <div className="col-span-2">
                 <BalanceOverview title="Balance Overview"
-                period="Last 6 months"
-                legendItems={[
-                { label: "Total Income", color: "blue" },
-                { label: "Total Spending", color: "orange" },
-                ]}/>
+               chart={balanceChart}/>
             </div>
             <div className="col-span-1">
-                <AllSpending />
+                <AllSpending
+                  data={allSpending}
+                  activeRange={activeRange}
+                  onRangeChange={onSpendingRangeChange}
+                />
             </div>
         </div>
     )

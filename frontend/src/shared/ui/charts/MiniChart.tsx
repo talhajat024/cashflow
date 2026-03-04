@@ -1,106 +1,73 @@
-type MiniChartProps = {
-  data: number[];
-  positive?: boolean;
-};
+  type MiniChartProps = {
+    data: [number, number, number];
+  };
 
-export function MiniChart({ data, positive = true }: MiniChartProps) {
-  const width = 88;
-  const height = 44;
-  const paddingBottom = 6;
-  const barWidth = 6;
+  export function MiniChart({ data }: MiniChartProps) {
+  const width = 64;  // Reduced to eliminate right space
+  const height = 40;
+  const paddingBottom = 4;
+
+  const barWidth = 10;
   const barGap = 8;
+  const startX = 4;  // Reduced left padding
 
   const maxValue = Math.max(...data);
+
   const scaleY = (value: number) =>
-    (value / maxValue) * (height - paddingBottom - 10);
+    (value / maxValue) * (height - paddingBottom - 6);
 
-  const lineColor = positive ? "#2563EB" : "#EF4444";
-  const barGradientId = positive ? "barGradientPositive" : "barGradientNegative";
-  const glowId = positive ? "glowPositive" : "glowNegative";
+  const BAR_COLORS = ["#F87171", "#6366F1", "#22D3EE"];
 
-  const linePath = data
-    .map((value, index) => {
-      const x = 6 + index * (barWidth + barGap);
-      const y = height - scaleY(value) - paddingBottom;
-      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-    })
-    .join(" ");
+  const bars = data.map((value, i) => {
+    const barHeight = scaleY(value);
+    const x = startX + i * (barWidth + barGap);
+    const y = height - barHeight - paddingBottom;
+    return { x, y, barHeight, color: BAR_COLORS[i] };
+  });
+
+  const linePath = `
+    M ${bars[0].x + barWidth / 2} ${bars[0].y}
+    Q ${bars[1].x + barWidth / 2} ${bars[1].y},
+      ${bars[2].x + barWidth / 2} ${bars[2].y}
+  `;
 
   return (
-    <svg
-      width={width}
-      height={height}
+    <svg 
+      width={width} 
+      height={height} 
       viewBox={`0 0 ${width} ${height}`}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block' }} // Removes any inline spacing
     >
-      {/* ===== DEFINITIONS ===== */}
-      <defs>
-        {/* Bar gradient */}
-        <linearGradient id={barGradientId} x1="0" y1="0" x2="0" y2="1">
-          {positive ? (
-            <>
-              <stop offset="0%" stopColor="#6366F1" />
-              <stop offset="100%" stopColor="#22D3EE" />
-            </>
-          ) : (
-            <>
-              <stop offset="0%" stopColor="#F87171" />
-              <stop offset="100%" stopColor="#FCA5A5" />
-            </>
-          )}
-        </linearGradient>
+      {bars.map((bar, i) => (
+        <rect
+          key={i}
+          x={bar.x}
+          y={bar.y}
+          width={barWidth}
+          height={bar.barHeight}
+          rx="3"
+          fill={bar.color}
+          opacity={0.7}
+        />
+      ))}
 
-        {/* Glow filter */}
-        <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {/* ===== BARS ===== */}
-      {data.map((value, index) => {
-        const barHeight = scaleY(value);
-        const x = 6 + index * (barWidth + barGap);
-        const y = height - barHeight - paddingBottom;
-
-        return (
-          <rect
-            key={index}
-            x={x}
-            y={y}
-            width={barWidth}
-            height={barHeight}
-            rx="3"
-            fill={`url(#${barGradientId})`}
-            opacity={0.35 + index * 0.12}
-          />
-        );
-      })}
-
-      {/* ===== TREND LINE ===== */}
       <path
         d={linePath}
-        stroke={lineColor}
-        strokeWidth="2.4"
+        stroke="#6366F1"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        filter={`url(#${glowId})`}
-        strokeDasharray="140"
-        strokeDashoffset="140"
-      >
-        <animate
-          attributeName="stroke-dashoffset"
-          from="140"
-          to="0"
-          dur="0.8s"
-          fill="freeze"
-          begin="0s"
-        />
-      </path>
+        opacity={0.9}
+      />
+
+      <circle
+        cx={bars[1].x + barWidth / 2}
+        cy={bars[1].y}
+        r="3"
+        fill="#FFFFFF"
+        stroke="#6366F1"
+        strokeWidth="1.2"
+      />
     </svg>
   );
 }

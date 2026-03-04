@@ -28,8 +28,3 @@ export const centerValue =cva([
     "font-semibold",
     "text-gray-900",
 ])
-
-export const centerLabel=cva([
-    "text-[12px]",
-    "text-gray-400",
-])

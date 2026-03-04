@@ -1,82 +1,104 @@
-    import { MoreHorizontal } from "lucide-react";
-    import {
-    wrapper,
-    header,
-    title,
-    menuButton,
-    summaryRow,
-    summaryItem,
-    summaryLabel,
-    summaryValue,
-    content,
-    chartArea,
-    legendArea,
-    } from "./AllSpending.styles";
+import { MoreHorizontal } from "lucide-react";
+import {
+  wrapper,
+  header,
+  title,
+  menuButton,
+  summaryRow,
+  summaryItem,
+  summaryLabel,
+  summaryValue,
+  content,
+  chartArea,
+  legendArea,
+} from "./AllSpending.styles";
 
-    import {
-    Card,
-    CardHeader,
-    CardContent,
-    } from "../../../../shared/ui/card/Card";
-    import { SpendingDonutChart } from "./SpendingDonutChart";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+} from "../../../../shared/ui/card/Card";
 
-    import { SpendingRow } from "./SpendingRow";
+import { SpendingDonutChart } from "./SpendingDonutChart";
+import { SpendingRow } from "./SpendingRow";
+import { getCurrencySymbol } from "../../../../shared/utils/currency";
 
-    export function AllSpending() {
-    return (
-        <Card>
-        
-        <CardHeader className={header()}>
-            <h3 className={title()}>All Spending</h3>
-            <button className={menuButton()}>
-            <MoreHorizontal size={18} />
-            </button>
-        </CardHeader>
+import type {
+  TimeRange,
+  AllSpending as AllSpendingType,
+} from "../../types/dashboard.types";
 
-        <CardContent className={wrapper()}>
-            <div className={summaryRow()}>
-            <div className={summaryItem()}>
-                <span className={summaryLabel()}>Weekly</span>
-                <span className={summaryValue()}>$874.00</span>
+type AllSpendingProps = {
+  data: AllSpendingType;
+  activeRange: TimeRange;
+  onRangeChange: (range: TimeRange) => void;
+};
+
+export function AllSpending({
+  data,
+  activeRange,
+  onRangeChange,
+}: AllSpendingProps) {
+  console.log("The data is:",data);
+  const { byRange,currency, summary } = data;
+
+  const chart = byRange[activeRange];
+  console.log("chart is:",chart);
+  console.log("The active range is:",activeRange)
+
+  return (
+    <Card className={wrapper()}>
+      <CardHeader className={header()}>
+        <h3 className={title()}>All Spending</h3>
+
+        <button className={menuButton()}>
+          <MoreHorizontal size={18} />
+        </button>
+      </CardHeader>
+
+      <CardContent className={wrapper()}>
+        {/* ===== Summary (acts as range selector) ===== */}
+        <div className={summaryRow()}>
+          {(["Weekly", "Monthly", "Yearly"] as TimeRange[]).map((range) => (
+            <div
+              key={range}
+              className={`${summaryItem()} cursor-pointer transition ${
+                activeRange === range
+                  ? "text-gray-900 font-semibold"
+                  : "text-gray-500 hover:bg-gray-50"
+              }`}
+              onClick={() => onRangeChange(range)}
+            >
+              <span className={summaryLabel()}>{range}</span>
+              <span className={summaryValue()}>
+                {getCurrencySymbol(currency)}
+                {summary[range.toLowerCase() as "weekly" | "monthly" | "yearly"].toFixed(2)}
+              </span>
             </div>
+          ))}
+        </div>
 
-            <div className={summaryItem()}>
-                <span className={summaryLabel()}>Monthly</span>
-                <span className={summaryValue()}>$8,985.56</span>
-            </div>
+        {/* ===== Chart + Legend ===== */}
+        <div className={content()}>
+          <div className={chartArea()}>
+            <SpendingDonutChart
+              total={chart.total}
+              categories={chart.categories}
+            />
+          </div>
 
-            <div className={summaryItem()}>
-                <span className={summaryLabel()}>Yearly</span>
-                <span className={summaryValue()}>$28,985.56</span>
-            </div>
-            </div>
-
-            <div className={content()}>
-            {/* Donut chart placeholder (SVG comes next) */}
-            <div className={chartArea()}>
-                <SpendingDonutChart />
-            </div>
-
-            {/* Legend */}
-            <div className={legendArea()}>
-                <SpendingRow
-                color="blue"
-                label="Workspace"
-                value={46}
-                />
-                <SpendingRow
-                color="green"
-                label="Employee Salary"
-                value={52}
-                />
-                <SpendingRow
-                color="cyan"
-                label="Shopping"
-                value={24}
-                />
-            </div>
-            </div>
-        </CardContent>
-        </Card>
-    );
-    }
+          <div className={legendArea()}>
+            {chart.categories.map((category) => (
+              <SpendingRow
+                key={category.key}
+                categoryKey={category.key}
+                label={category.label}
+                value={category.percentage}
+              />
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

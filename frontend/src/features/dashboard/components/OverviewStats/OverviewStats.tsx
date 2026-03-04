@@ -1,38 +1,61 @@
 import { StatCard } from "../StatCard";
 import { statsWrapper, statsGrid } from "./OverviewStats.styles";
-import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 
-export function OverviewStats() {
+import type { SummaryCard } from "../../types/dashboard.types";
+
+type OverviewStatsProps = {
+  cards: SummaryCard[];
+};
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  totalBalance: <Wallet size={18} />,
+  totalIncome: <TrendingUp size={18} />,
+  totalSpending: <TrendingDown size={18} />,
+};
+
+const TONE_MAP: Record<string, "blue" | "green" | "red"> = {
+  totalBalance: "blue",
+  totalIncome: "green",
+  totalSpending: "red",
+};
+
+export function OverviewStats({ cards }: OverviewStatsProps) {
   return (
     <section className={statsWrapper()}>
       <div className={statsGrid()}>
-      <StatCard
-          title="Total Balance"
-          period="2 July - 24 September 2023"
-          value="$982,000.90"
-          icon={<Wallet size={18} />}
-          tone="blue"
-          trend={{ label: "+12% vs last month", positive: true }}
-      />
+        {cards.map((card) => {
+          const icon =
+            ICON_MAP[card.key] ?? <Wallet size={18} />;
+          const tone =
+            TONE_MAP[card.key] ?? "blue";
 
-      <StatCard
-        title="Total Income"
-        period="9 July - 24 September 2023"
-        value="$854,348.00"
-        icon={<TrendingUp size={18} />}
-        tone="green"
-        trend={{ label: "+8.2%", positive: true }}
-      />
-        
-      <StatCard
-        title="Total Spending"
-        period="24 July - 24 September 2023"
-        value="$432,120.00"
-        icon={<TrendingDown size={18} />}
-        tone="red"
-        trend={{ label: "-4.1%", positive: false }}
-      />
+          // const trendLabel = `${
+          //   card.isPositiveTrend ? "+" : ""
+          // }${card.percentageChange}% ${card.comparisonLabel}`;
 
+          return (
+           <StatCard
+            key={card.key}
+            title={card.title}
+            period={card.dateRange}
+            amount={card.amount}
+            currency={card.currency}
+            icon={icon}
+            tone={tone}
+            trend={{
+              percentage: card.percentageChange,
+              label: card.comparisonLabel,
+              positive: card.isPositiveTrend,
+            }}
+            miniChartData={[40, 65, 80]} // optional, replace later
+          />
+          );
+        })}
       </div>
     </section>
   );

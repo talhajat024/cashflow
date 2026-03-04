@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { MiniChart } from "../../../shared/ui/charts";
+import { getCurrencySymbol } from "../../../shared/utils/currency";
+
 import {
   card,
   header,
@@ -10,56 +12,70 @@ import {
   valueText,
   trendText,
   chartWrapper,
+  headerRight,
+  contentRight
 } from "./StatCard.styles";
 
 type Trend = {
+  percentage: number;
   label: string;
   positive: boolean;
 };
 
 type StatCardProps = {
- title: string;
+  title: string;
   period: string;
-  value: string;
+  amount: number;
+  currency: string;
   icon: ReactNode;
   trend: Trend;
   tone?: "blue" | "green" | "red";
+  miniChartData?: number[];
 };
 
 export function StatCard({
   title,
   period,
-  value,
+  amount,
+  currency,
   icon,
   tone,
   trend,
+  miniChartData,
 }: StatCardProps) {
+  const symbol = getCurrencySymbol(currency);
+  const formattedAmount = `${symbol}${amount.toLocaleString()}`;
+
   return (
-    <div className={card()}>
-      <div className={header()}>
-        <div>
-          <h4 className={titleText()}>{title}</h4>
-          <p className={periodText()}>{period}</p>
-        </div>
+   <div className={card()}>
+  {/* Left column: title + period */}
+  <div className={header()}>
+    <h4 className={titleText()}>{title}</h4>
+    <p className={periodText()}>{period}</p>
+  </div>
 
-        <div className={iconWrapper({ tone })}>{icon}</div>
+  {/* Right column: icon */}
+  <div className={headerRight()}>
+    <div className={iconWrapper({ tone })}>{icon}</div>
+  </div>
+
+  {/* Left column: amount + trend */}
+  <div className={content()}>
+    <p className={valueText()}>{formattedAmount}</p>
+    <p className={trendText({ positive: trend.positive })}>
+      {trend.positive ? "+" : ""}
+      {trend.percentage}% {trend.label}
+    </p>
+  </div>
+
+  {/* Right column: chart */}
+  <div className={contentRight()}>
+    {miniChartData && (
+      <div className={chartWrapper()}>
+        <MiniChart data={miniChartData as [number, number, number]} />
       </div>
-
-      <div className={content()}>
-        <div>
-          <p className={valueText()}>{value}</p>
-          <p className={trendText({ positive: trend.positive })}>
-            {trend.label}
-          </p>
-        </div>
-
-        <div className={chartWrapper()}>
-          <MiniChart
-          data={[30, 45, 40, 60, 55, 70]}
-          positive={trend.positive}
-          />
-        </div>
-      </div>
-    </div>
+    )}
+  </div>
+</div>
   );
 }

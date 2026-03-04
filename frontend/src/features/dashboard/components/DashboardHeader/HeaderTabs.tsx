@@ -1,4 +1,4 @@
-import { tabs, tabItem, tabUnderline } from "./HeaderTabs.styles";
+import { tabs, tabItem, tabUnderline, tabsContainer,baseUnderline } from "./HeaderTabs.styles";
 
 const ITEMS = [
   'Overview',
@@ -14,22 +14,25 @@ export const HeaderTabs = () => {
   const activeTab = 'Overview';
 
   return (
-   <nav className={tabs()} role="tablist">
-      {ITEMS.map((item) => {
-        const isActive = item === activeTab;
+    <div className={tabsContainer()}>
+      <nav className={tabs()} role="tablist">
+        {ITEMS.map((item) => {
+          const isActive = item === activeTab;
 
-        return (
-           <span
-            key={item}
-            role="tab"
-            aria-selected={isActive}
-            className={tabItem({ active: isActive })}
-          >
-            {item}
-            {isActive && <span className={tabUnderline()} />}
-          </span>
-        );
-      })}
-    </nav>
+          return (
+            <span
+              key={item}
+              role="tab"
+              aria-selected={isActive}
+              className={tabItem({ active: isActive })}
+            >
+              {item}
+              {isActive && <span className={tabUnderline()} />}
+            </span>
+          );
+        })}
+      </nav>
+      <div className={baseUnderline()} />
+    </div>
   );
 };
