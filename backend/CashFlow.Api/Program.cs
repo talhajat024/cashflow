@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options=> options.UseSqlServer(build
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
+builder.Services.AddScoped<IEmailService,EmailService>();
 
 // Jwt Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

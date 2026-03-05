@@ -24,6 +24,9 @@ public class UserRepository:IUserRepository
     .Include(u=> u.RefreshTokens)
     .FirstOrDefaultAsync(u=> u.Id == id);
 
+    public async Task<bool> EmailExistsAsync(string email)
+    => await _context.Users.AnyAsync(u=> u.Email.ToLower() == email.ToLower());
+
     public async Task AddAsync(User user)
     => await _context.Users.AddAsync(user);
 

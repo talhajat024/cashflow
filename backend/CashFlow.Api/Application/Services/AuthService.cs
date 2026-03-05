@@ -10,12 +10,14 @@ public class AuthService:IAuthService
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
     private readonly IConfiguration _config;
+    private readonly IEmailService _emailService;
 
-    public AuthService(IUserRepository userRepository,ITokenService tokenService,IConfiguration config)
+    public AuthService(IUserRepository userRepository,ITokenService tokenService,IConfiguration config,IEmailService emailService)
     {
         _userRepository=userRepository;
         _tokenService=tokenService;
         _config= config;
+        _emailService=emailService;
     }
 
     public async Task<AuthResponseDto> LoginAsync(LoginRequestDto dto)
@@ -69,6 +71,42 @@ public class AuthService:IAuthService
             AccessToken=newAccessTokens,
             RefreshToken= newRefreshToken,
             User= MapToUserDto(storedToken.User)
+        };
+    }
+
+    public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto)
+    {
+        // validate password match
+        if(dto.Password != dto.ConfirmPassword)
+        {
+            throw new InvalidOperationException("Password do not match");
+        }
+
+        // check duplicate email
+        if(await _userRepository.EmailExistsAsync(dto.Email))
+        {
+            throw new InvalidOperationException("An account with this email already exists");
+        }
+
+        // Create User
+        var user= new User
+        {
+            Id=Guid.NewGuid(),
+            Name=dto.Name.Trim(),
+            Email=dto.Email.ToLower().Trim(),
+            PasswordHash=BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            CreatedAt=DateTime.UtcNow,
+        };
+
+        await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
+
+        _=Task.Run(()=> _emailService.SendWelcomeEmailAsync(user.Email,user.Name));
+
+        // Return user
+        return new AuthResponseDto
+        {
+            User=MapToUserDto(user)
         };
     }
 

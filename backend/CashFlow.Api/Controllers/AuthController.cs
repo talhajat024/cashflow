@@ -40,6 +40,24 @@ public class AuthController:ControllerBase
         }
     }
 
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
+    {
+        try
+        {
+            var result= await _authService.RegisterAsync(dto);
+            return Ok(new
+            {
+                message="Account created successfully. Please login in.",
+                user=result.User
+            });
+        }
+        catch(InvalidOperationException ex)
+        {
+            return BadRequest(new {message=ex.Message});
+        }
+    }
+
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
