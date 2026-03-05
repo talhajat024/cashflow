@@ -1,5 +1,5 @@
 import { useState,useEffect } from "react";
-import { getCurrentUser,signOut as apiSignOut } from "../api/user.api";
+import { getCurrentUser , logout as apiSignOut } from "../../auth/api/auth.api";
 import type { User } from "../types/user.types";
 
 const MOCK_USER:User={

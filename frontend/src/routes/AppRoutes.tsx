@@ -2,11 +2,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import {  lazy, Suspense } from "react";
 import { LoginPage } from "../features/auth/pages/LoginPage";
+import { SignupPage } from "../features/auth/pages/SignupPage/SignupPage";
 import { withAuth } from "../features/auth";
 import DashboardLayout from "../features/dashboard/layout/DashboardLayout";
-import AnalyticsLayout from "../features/analytics/layout/AnalyticsLayout";
-import TransactionsLayout from "../features/transactions/layout/TransactionsLayout";
-import WalletsLayout from "../features/wallets/layout/WalletsLayout";
+// import AnalyticsLayout from "../features/analytics/layout/AnalyticsLayout";
+// import TransactionsLayout from "../features/transactions/layout/TransactionsLayout";
+// import WalletsLayout from "../features/wallets/layout/WalletsLayout";
 
 // Import your skeleton
 import { PageSkeleton } from "../shared/ui/pageskeleton/PageSkeleton";
@@ -39,6 +40,12 @@ const AppRoutes = () => {
                     <LoginPage />
                 </PublicOnlyRoute>
             } />
+
+            <Route path="/signup" element={
+            <PublicOnlyRoute>
+              <SignupPage />
+            </PublicOnlyRoute>
+          } />
 
       <Route path="/" element={<Navigate to="/dashboard/overview" />} />
       

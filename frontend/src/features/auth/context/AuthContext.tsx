@@ -134,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const appUser = transformUser(response.user);
             tokenStorage.setUser(appUser);
             setUser(appUser);
-            navigate('/dashboard/overview', { replace: true });
+            navigate('/login', { replace: true });
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Signup failed';
             console.error("Signup error:", errorMessage);
