@@ -131,9 +131,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const response = await authApi.signup(data);
             console.log("Signup successful for:", response.user.email);
 
-            const appUser = transformUser(response.user);
-            tokenStorage.setUser(appUser);
-            setUser(appUser);
             navigate('/login', { replace: true });
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Signup failed';
