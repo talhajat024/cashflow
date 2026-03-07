@@ -1,48 +1,41 @@
-using System.Security.Cryptography.X509Certificates;
-using System.Transactions;
-
+using CashFlow.Api.Domain.Enums;
 namespace CashFlow.Api.Domain.Entities;
 
 public class Transaction
 {
-    public Guid Id {get;set;}
+    public Guid Id {get;set;}=Guid.NewGuid();
+
+    // Ownership
     public Guid UserId {get;set;}
+    public Guid WalletId {get;set;}
+    public Guid? ToWalletId {get;set;}
+
+    // Financial
     public decimal Amount {get;set;}
     public TransactionType Type {get;set;}
     public TransactionNature Nature {get;set;}
-    public TransactionStatus Status {get;set;}
-    public DateTime CreatedAt {get;set;}
+    public TransactionStatus Status {get;set;}=TransactionStatus.Completed;
 
-    // who
-    public string CounterpartyName {get;set;}= string.Empty;
-    public string MerchantCategory {get;set;}=string.Empty;
+    // Counterparty (who)
+    public string CounterpartyName {get;set;}=string.Empty;
+    public string? CounterpartyLogo {get;set;}
+    public string Category {get;set;}=string.Empty;
 
-    // why
-    public string CategoryKey {get;set;}= string.Empty;
-    public string CategoryLabel {get;set;}= string.Empty;
+    // Details (why)
+    public string? Description {get;set;} // optional note
+
+    // Dates
+    public DateTime Date {get;set;}= DateTime.UtcNow;
+    public DateTime CreatedAt {get;set;}=DateTime.UtcNow;
+
+    // Navigation
+    public User User {get;set;}= null!;
+    public Wallet Wallet {get;set;} = null!;
+    public Wallet? ToWallet {get;set;}
 }
 
-public enum TransactionType
-{
-    Income,
-    Expense,
-}
 
-public enum TransactionStatus
-{
-    Incomplete,
-    Completed,
-    Failed
-}
 
-public enum TransactionNature
-{
-    Subscription,
-    Receive,
-    Transfer,
-    Refund,
-    Payout
-}
 
 
 

@@ -132,8 +132,6 @@ dist
 .tern-port
 
 # Backend specific
-**/migrations/
-**/Migrations/
 **/SeedData/
 
 # Certificate files

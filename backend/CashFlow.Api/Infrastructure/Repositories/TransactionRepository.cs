@@ -1,95 +1,46 @@
 using CashFlow.Api.Domain.Entities;
+using CashFlow.Api.Domain.Enums;
+using CashFlow.Api.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 namespace CashFlow.Api.Infrastructure.Repositories;
 
 public class TransactionRepository:ITransactionRepository
 {
-    public Task<IReadOnlyList<Transaction>> GetByUserAsync(Guid userId)
+    private readonly AppDbContext _context;
+    private readonly IDbContextFactory<AppDbContext> _contextFactory;
+    public TransactionRepository(AppDbContext context,IDbContextFactory<AppDbContext> contextFactory)
     {
-        var data = GetSeedData(userId);
-        return Task.FromResult<IReadOnlyList<Transaction>>(
-            data.Where(t => t.UserId == userId)
-            .OrderByDescending(t => t.CreatedAt)
-            .ToList()
-        );
+        _context=context;
+        _contextFactory=contextFactory;
+    } 
+    
+    public async Task<IReadOnlyList<Transaction>> GetByUserAsync(Guid userId)
+    => await _context.Transactions.Where(t=> t.UserId== userId)
+    .Include(t=> t.Wallet)
+    .OrderByDescending(t=> t.Date)
+    .ToListAsync();
+
+    public async Task<IReadOnlyList<Transaction>> GetRecentAsync(Guid userId,int count)
+    => await _context.Transactions.Where(t=> t.UserId == userId)
+    .Include(t=> t.Wallet)
+    .OrderByDescending(t=> t.Date)
+    .Take(count)
+    .ToListAsync();
+
+    public async Task<decimal> GetTotalByTypeAndPeriodAsync(Guid userId,TransactionType type,DateTime startDate,DateTime endDate)
+    {
+        await using var ctx = await _contextFactory.CreateDbContextAsync();
+        return await ctx.Transactions.Where(t=> t.UserId == userId && t.Type == type && t.Date >= startDate && t.Date <= endDate).SumAsync(t=> t.Amount);
     }
 
-    public Task<IReadOnlyList<Transaction>> GetRecentAsync(Guid userId,int count)
+    public async Task<decimal> GetAllTimeTotalByTypeAsync(Guid userId,TransactionType type)
     {
-        var data = GetSeedData(userId);
-        return Task.FromResult<IReadOnlyList<Transaction>>(
-            data
-            .Where(t => t.UserId == userId)
-                .OrderByDescending(t => t.CreatedAt)
-                .Take(count)
-                .ToList()
-        );
+        await using var ctx = await _contextFactory.CreateDbContextAsync();
+        return await ctx.Transactions.Where(t=> t.UserId == userId && t.Type == type).SumAsync(t=> t.Amount);
     }
+    public async Task AddAsync(Transaction transaction)
+    => await _context.Transactions.AddAsync(transaction);
 
-    private static List<Transaction> GetSeedData(Guid userId)=>
-    new()
-    {
-       new Transaction
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Amount = 1800,
-            Type = TransactionType.Expense,
-            Nature = TransactionNature.Subscription,
-            Status = TransactionStatus.Incomplete,
-            CounterpartyName = "Figma",
-            MerchantCategory = "Application",
-            CategoryKey = "workspace",
-            CategoryLabel = "Workspace",
-            CreatedAt = DateTime.UtcNow.AddDays(-2)
-        },
-
-        // ===== Expense: Employee Salary =====
-        new Transaction
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Amount = 4200,
-            Type = TransactionType.Expense,
-            Nature = TransactionNature.Payout,
-            Status = TransactionStatus.Incomplete,
-            CounterpartyName = "Employees",
-            MerchantCategory = "Payroll",
-            CategoryKey = "employeesalary",
-            CategoryLabel = "Employee Salary",
-            CreatedAt = DateTime.UtcNow.AddDays(-5)
-        },
-
-        // ===== Expense: Shopping / Entertainment =====
-        new Transaction
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Amount = 950,
-            Type = TransactionType.Expense,
-            Nature = TransactionNature.Subscription,
-            Status = TransactionStatus.Incomplete,
-            CounterpartyName = "Spotify",
-            MerchantCategory = "Entertainment",
-            CategoryKey = "shopping",
-            CategoryLabel = "Shopping",
-            CreatedAt = DateTime.UtcNow.AddDays(-1)
-        },
-
-        // ===== Income: Business Income =====
-        new Transaction
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Amount = 9000,
-            Type = TransactionType.Income,
-            Nature = TransactionNature.Receive,
-            Status = TransactionStatus.Completed,
-            CounterpartyName = "Client Payments",
-            MerchantCategory = "Business",
-            CategoryKey = "income",
-            CategoryLabel = "Business Income",
-            CreatedAt = DateTime.UtcNow.AddDays(-7)
-        }
-    };
-
+    public async Task SaveChangesAsync()
+    => await _context.SaveChangesAsync();
 }

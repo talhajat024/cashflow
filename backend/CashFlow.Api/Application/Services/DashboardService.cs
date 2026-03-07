@@ -12,29 +12,60 @@ namespace CashFlow.Api.Application.Services;
 public class DashboardService : IDashboardService
 {
     private readonly ITransactionService _transactionService;
-    public DashboardService(ITransactionService transactionService)
+    private readonly IWalletService _walletService;
+    public DashboardService(ITransactionService transactionService,IWalletService walletService)
     {
         _transactionService=transactionService;
+        _walletService=walletService;
     }
-
 
     public async Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,int balanceRangeInMonths)
     {
-        var transactions= await _transactionService.GetAllAsync(userId);
+        var now= DateTime.UtcNow;
 
-            return new DashboardOverviewDto
-            {
-                SummaryCards=BuildSummaryCards(transactions),
-                BalanceOverviewChart = BuildBalanceOverviewChart(transactions,balanceRangeInMonths),
-                AllSpending = BuildAllSpending(transactions),
-                RecentTransactions = BuildRecentTransactions(transactions)
-            };        
+        // Date Range
+        var thisMonthStart = new DateTime(now.Year,now.Month,1);
+        var thisMonthEnd = thisMonthStart.AddMonths(1).AddDays(-1);
+        var lastMonthStart = thisMonthStart.AddMonths(-1);
+        var lastMonthEnd = thisMonthStart.AddDays(-1);
+
+        // Parallel Queries via Services
+        var totalBalanceTask = _walletService.GetTotalBalanceAsync(userId);
+        var incomeThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,thisMonthStart,thisMonthEnd);
+        var incomeLastMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,lastMonthStart,lastMonthEnd); 
+        var spendingThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,thisMonthStart,thisMonthEnd); 
+        var spendingLastMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,lastMonthStart,lastMonthEnd); 
+        var allTransactionsTask =  _transactionService.GetAllAsync(userId);
+
+        await Task.WhenAll(
+            totalBalanceTask,
+            incomeThisMonthTask,incomeLastMonthTask,
+            spendingThisMonthTask,spendingLastMonthTask,
+            allTransactionsTask
+        );
+
+        var totalBalance= totalBalanceTask.Result;
+        var incomeThisMonth= incomeThisMonthTask.Result;
+        var incomeLastMonth= incomeLastMonthTask.Result;
+        var spendingThisMonth=spendingThisMonthTask.Result;
+        var spendingLastMonth= spendingLastMonthTask.Result;
+        var allTransactions=allTransactionsTask.Result;
+
+        var incomeChange = CalculatePercentageChange(incomeLastMonth,incomeThisMonth);
+        var spendingChange = CalculatePercentageChange(spendingLastMonth,spendingThisMonth);
+
+        return new DashboardOverviewDto
+        {
+            SummaryCards=BuildSummaryCards(totalBalance,incomeThisMonth,incomeChange,spendingThisMonth,spendingChange),
+            BalanceOverviewChart = BuildBalanceOverviewChart(allTransactions,balanceRangeInMonths),
+            AllSpending = BuildAllSpending(allTransactions),
+            RecentTransactions = BuildRecentTransactions(allTransactions)
+        };        
     }
 
-    private IReadOnlyList<SummaryCardDto> BuildSummaryCards(IEnumerable<Transaction> transactions)
+    private static IReadOnlyList<SummaryCardDto> BuildSummaryCards(decimal totalBalance,decimal incomeThisMonth,decimal incomeChange,decimal spendingThisMonth,decimal spendingChange)
     {
-        var income = transactions.Where(t=> t.Type == TransactionType.Income).Sum(t=> t.Amount);
-        var expense = transactions.Where(t=> t.Type == TransactionType.Expense).Sum(t=> t.Amount);
+        var now= DateTime.UtcNow.ToString("MMM yyyy");
 
         return new List<SummaryCardDto>
         {
@@ -42,33 +73,33 @@ public class DashboardService : IDashboardService
             {
                 Key="totalBalance",
                 Title="Total Balance",
-                Amount=income-expense,
-                PercentageChange=16, // dummy
-                ComparisonLabel="Last Year",
-                DateRange="Jul - Sep 2023"
+                Amount=totalBalance,
+                PercentageChange=0, 
+                ComparisonLabel="All Wallets",
+                DateRange=now
             },
             new()
             {
                 Key="totalIncome",
                 Title="Total Income",
-                Amount= income,
-                PercentageChange=12, // dummy
-                ComparisonLabel="Last Month",
-                DateRange="Jul - Sep 2023"
+                Amount= incomeThisMonth,
+                PercentageChange=Math.Abs(incomeChange), 
+                ComparisonLabel=incomeChange >= 0 ? "▲ vs last month" : "▼ vs last month",
+                DateRange=now
             },
             new()
             {
                 Key="totalSpending",
                 Title="Total Spending",
-                Amount=expense,
-                PercentageChange=-10,
-                ComparisonLabel="Last Year",
-                DateRange="Jul - Sep 2023"
+                Amount=spendingThisMonth,
+                PercentageChange=Math.Abs(spendingChange),
+                ComparisonLabel=spendingChange <= 0 ? "▲ vs last month" : "▼ vs last month",
+                DateRange=now
             }
         };
     }
 
-    private BalanceOverviewChartDto BuildBalanceOverviewChart(IEnumerable<Transaction> transactions,int rangeInMonths)
+    private static BalanceOverviewChartDto BuildBalanceOverviewChart(IEnumerable<Transaction> transactions,int rangeInMonths)
     {
         var now = DateTime.UtcNow;
         var months = Enumerable.Range(0,rangeInMonths)
@@ -85,7 +116,7 @@ public class DashboardService : IDashboardService
         .ToList();
 
         // Group Transactions by year + month
-        var grouped = transactions.GroupBy(t=> new{t.CreatedAt.Year,t.CreatedAt.Month})
+        var grouped = transactions.GroupBy(t=> new{t.Date.Year,t.Date.Month})
         .ToDictionary(g=> g.Key,g=> g.ToList());
 
         var incomeSeries = new BalanceChartSeriesDto
@@ -141,7 +172,7 @@ public class DashboardService : IDashboardService
         };
     }
 
-    private AllSpendingDto BuildAllSpending(IEnumerable<Transaction> transactions)
+    private static AllSpendingDto BuildAllSpending(IEnumerable<Transaction> transactions)
     {
         var now = DateTime.UtcNow;
         var expenses = transactions
@@ -150,14 +181,14 @@ public class DashboardService : IDashboardService
 
         var summary = new SpendingSummaryDto
         {
-            Weekly = expenses.Where(t=> t.CreatedAt >= now.AddDays(-7))
+            Weekly = expenses.Where(t=> t.Date >= now.AddDays(-7))
             .Sum(t=> t.Amount),
 
             Monthly = expenses
-            .Where(t=> t.CreatedAt >= now.AddMonths(-1))
+            .Where(t=> t.Date >= now.AddMonths(-1))
             .Sum(t=> t.Amount),
 
-            Yearly = expenses.Where(t=> t.CreatedAt >= now.AddYears(-1))
+            Yearly = expenses.Where(t=> t.Date >= now.AddYears(-1))
             .Sum(t=> t.Amount)
         };    
 
@@ -174,17 +205,17 @@ public class DashboardService : IDashboardService
                  _ => now.AddMonths(-1)
             };
 
-       var rangeExpenses = expenses.Where(t=> t.CreatedAt >= rangeStart)
+       var rangeExpenses = expenses.Where(t=> t.Date >= rangeStart)
        .ToList();
 
        decimal total = rangeExpenses.Sum(t=> t.Amount);
-       var categories = rangeExpenses.GroupBy(t=> new {t.CategoryKey,t.CategoryLabel}).Select(g=>
+       var categories = rangeExpenses.GroupBy(t=> t.Category).Select(g=>
        {
            var amount = g.Sum(x=> x.Amount);
            return new SpendingCategoryDto
            {
-               Key = g.Key.CategoryKey,
-               Label = g.Key.CategoryLabel,
+               Key = g.Key.ToLower().Replace(" ",""),
+               Label = g.Key,
                Amount = amount,
                Percentage= total ==0
                ? 0 : Math.Round((amount/total)*100,2)
@@ -208,38 +239,45 @@ public class DashboardService : IDashboardService
     }
 
 
-    private List<TransactionDto> BuildRecentTransactions(IEnumerable<Transaction> transactions,int count =2)
+    private static List<TransactionDto> BuildRecentTransactions(IEnumerable<Transaction> transactions,int count =5)
     {
-        return transactions.OrderByDescending(t=> t.CreatedAt).Take(count).Select(t=> new TransactionDto
+        return transactions.OrderByDescending(t=> t.Date).Take(count).Select(t=> new TransactionDto
         {
             Company= t.CounterpartyName,
-            Category = t.MerchantCategory,
+            Category = t.Category,
             Type=t.Nature.ToString(),
-            Date=t.CreatedAt,
+            Date=t.Date,
             Amount = t.Amount,
             Status = t.Status.ToString(),
-            IconKey = ResolveIconKey(t.CategoryKey)
+            IconKey = ResolveIconKey(t.Category)
         })
         .ToList();
     }
 
-    private static string ResolveCompanyName(Transaction transaction)
+
+    // Helpers
+
+    private static decimal CalculatePercentageChange(decimal previous, decimal current)
     {
-        // Placeholder logic — replace later with real merchant data
-        return transaction.Type == TransactionType.Income
-            ? "Income"
-            : transaction.CategoryLabel;
+        if (previous == 0) return current > 0 ? 100 : 0;
+        return Math.Round(((current - previous) / previous) * 100, 1);
     }
-    
-    private static string ResolveIconKey(string categoryKey)
+
+    private static string ResolveIconKey(string category)
     {
-        return categoryKey switch
+        return category.ToLower() switch
         {
-            "shopping"  => "shopping-cart",
-            "workspace" => "briefcase",
-            "food"      => "utensils",
-            "travel"    => "plane",
-            _           => "wallet"
+        "entertainment" => "shopping-cart",
+        "application"   => "briefcase",
+        "food"          => "utensils",
+        "travel"        => "plane",
+        "payroll"       => "users",
+        "business"      => "building",
+        "employment"    => "briefcase",
+        "freelance"     => "laptop",
+        "utilities"     => "zap",
+        "housing"       => "home",
+        _               => "wallet"
         };
     }
 }
