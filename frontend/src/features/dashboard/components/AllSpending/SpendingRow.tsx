@@ -9,28 +9,21 @@ import {
 import type { SpendingCategory } from "../../types/dashboard.types";
 
 // Same color map as donut (keep consistent)
-const CATEGORY_COLORS: Record<string, string> = {
-  workspace: "#2563EB",
-  employeesalary: "#F97316",
-  shopping: "#22D3EE",
-  food: "#F97316",
-  travel: "#A855F7",
-};
-
-const DEFAULT_COLOR = "#CBD5E1";
+const DONUT_COLORS = ["#1D4ED8", "#F97316", "#22D3EE"]; 
 
 type SpendingRowProps = {
   categoryKey: SpendingCategory["key"];
   label: string;
   value: number;
+  index:number;
 };
 
 export function SpendingRow({
-  categoryKey,
   label: text,
   value: percent,
+  index
 }: SpendingRowProps) {
-  const color = CATEGORY_COLORS[categoryKey] ?? DEFAULT_COLOR;
+  const color = DONUT_COLORS[index] ?? "#CBD5E1";
 
   return (
     <div className={row()}>

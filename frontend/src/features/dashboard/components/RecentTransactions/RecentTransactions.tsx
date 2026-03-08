@@ -17,6 +17,7 @@ type RecentTransactionsProps = {
 export function RecentTransactions({
   transactions,
 }: RecentTransactionsProps) {
+  const topTransactions = transactions.slice(0, 2);
   return (
     <Card>
       <CardContent className="p-0">
@@ -32,7 +33,7 @@ export function RecentTransactions({
 
           {/* ===== Table Body ===== */}
           <div className={body()}>
-            {transactions.map((tx) => (
+            {topTransactions.map((tx) => (
              <TransactionRow
             key={`${tx.company}-${tx.date}`}
             icon={

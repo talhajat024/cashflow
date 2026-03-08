@@ -63,8 +63,7 @@ export function StatCard({
   <div className={content()}>
     <p className={valueText()}>{formattedAmount}</p>
     <p className={trendText({ positive: trend.positive })}>
-      {trend.positive ? "+" : ""}
-      {trend.percentage}% {trend.label}
+       {trend.label}
     </p>
   </div>
 

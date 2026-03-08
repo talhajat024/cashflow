@@ -53,6 +53,7 @@ export default function DashboardLayout() {
 
 
     const handleBalanceRangeChange=(range:string)=>{
+      console.log("Balance Range Chnaged:",range);
       const newParams=new URLSearchParams(searchParams);
       newParams.set("balance",range);
       setSearchParams(newParams);

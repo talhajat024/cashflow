@@ -15,7 +15,10 @@ export function useDashboardOverview(balanceRangeInMonths:number){
 
         getDashboardOverview(balanceRangeInMonths)
         .then((res)=>{
-            if(!cancelled) setData(res);
+            if(!cancelled) {
+                console.log("The Reponse of Dashboard Overview is:",res);
+                setData(res)
+            }
         })
         .catch((err)=>{
             if(!cancelled) setError(err.message);

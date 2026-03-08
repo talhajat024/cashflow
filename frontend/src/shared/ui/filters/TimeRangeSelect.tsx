@@ -3,7 +3,7 @@ import { Calendar, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { styles } from "./TimeRangeSelect.styles";
 
-export type TimeRange = '3' | '6' | '12' | '24';
+export type TimeRange = '3' | '6' | '12';
 
 interface TimeRangeSelectProps {
   value: TimeRange;
@@ -15,7 +15,6 @@ const RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
   { value: '3', label: 'Last 3 months' },
   { value: '6', label: 'Last 6 months' },
   { value: '12', label: 'Last 12 months' },
-  { value: '24', label: 'Last 24 months' },
 ];
 
 export function TimeRangeSelect({ value, onChange, label }: TimeRangeSelectProps) {

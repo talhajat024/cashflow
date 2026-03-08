@@ -21,15 +21,7 @@ const STROKE_WIDTH = 9;
 const BASE_RADIUS = 65;
 const RADIUS_STEP = 15;
 
-const CATEGORY_COLORS: Record<string, string> = {
-  workspace: "#1D4ED8", // dark blue
-  employeesalary: "#F97316",    // orange
-  shopping: "#22D3EE",  // cyan
-  food: "#F97316",
-  travel: "#A855F7",
-};
-
-const DEFAULT_COLOR = "#CBD5E1";
+const DONUT_COLORS = ["#1D4ED8", "#F97316", "#22D3EE"];
 
 function getStroke(value: number, radius: number) {
   const circumference = 2 * Math.PI * radius;
@@ -48,8 +40,7 @@ export function SpendingDonutChart({
       >
         {categories.map((category, index) => {
           const radius = BASE_RADIUS - index * RADIUS_STEP;
-          const color =
-            CATEGORY_COLORS[category.key] ?? DEFAULT_COLOR;
+          const color =DONUT_COLORS[index];
 
           return (
             <g key={category.key}>

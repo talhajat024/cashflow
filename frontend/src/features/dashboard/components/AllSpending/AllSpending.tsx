@@ -42,6 +42,8 @@ export function AllSpending({
   const { byRange,currency, summary } = data;
 
   const chart = byRange[activeRange];
+  const top3 = chart.categories.slice(0, 3);
+
 
   return (
     <Card className={wrapper()}>
@@ -54,7 +56,6 @@ export function AllSpending({
       </CardHeader>
 
       <CardContent className={wrapper()}>
-        {/* ===== Summary (acts as range selector) ===== */}
         <div className={summaryRow()}>
           {(["Weekly", "Monthly", "Yearly"] as TimeRange[]).map((range) => (
             <div
@@ -75,22 +76,22 @@ export function AllSpending({
           ))}
         </div>
 
-        {/* ===== Chart + Legend ===== */}
         <div className={content()}>
           <div className={chartArea()}>
             <SpendingDonutChart
               total={chart.total}
-              categories={chart.categories}
+              categories={top3}
             />
           </div>
 
           <div className={legendArea()}>
-            {chart.categories.map((category) => (
+            {top3.map((category,index) => (
               <SpendingRow
                 key={category.key}
                 categoryKey={category.key}
                 label={category.label}
                 value={category.percentage}
+                index={index}
               />
             ))}
           </div>
