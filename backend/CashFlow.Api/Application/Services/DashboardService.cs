@@ -23,50 +23,76 @@ public class DashboardService : IDashboardService
     {
         var now= DateTime.UtcNow;
 
-        // Date Range
-        var thisMonthStart = new DateTime(now.Year,now.Month,1);
-        var thisMonthEnd = thisMonthStart.AddMonths(1).AddDays(-1);
-        var lastMonthStart = thisMonthStart.AddMonths(-1);
-        var lastMonthEnd = thisMonthStart.AddDays(-1);
+        var rangeStart= now.AddMonths(-3);
+        var rangeEnd= now;
+        var rangeLabel=$"{rangeStart:dd MMM yyyy} - {rangeEnd:dd MMM yyyy}";
 
-        // Parallel Queries via Services
+        var thisMonthStart =new DateTime(now.Year,now.Month,1);
+        var thisMonthEnd= now;
+
+        var lastMonthStart=thisMonthStart.AddMonths(-1);
+        var lastMonthEnd= thisMonthStart.AddDays(-1);
+
+        var monthBeforeStart= lastMonthStart.AddMonths(-1);
+        var monthBeforeEnd= lastMonthStart.AddDays(-1);
+
         var totalBalanceTask = _walletService.GetTotalBalanceAsync(userId);
-        var incomeThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,thisMonthStart,thisMonthEnd);
-        var incomeLastMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,lastMonthStart,lastMonthEnd); 
+
+        var incomeRangeTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,rangeStart,rangeEnd);
+        var spendingRangeTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,rangeStart,rangeEnd); 
+
+        var incomeThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,thisMonthStart,thisMonthEnd); 
         var spendingThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,thisMonthStart,thisMonthEnd); 
-        var spendingLastMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,lastMonthStart,lastMonthEnd); 
+
+        var incomeLastMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,lastMonthStart,lastMonthEnd);
+        var spendingLastMonthTask= _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,lastMonthStart,lastMonthEnd);
+
+        var incomeMonthBeforeTask   = _transactionService.GetTotalByTypeAndPeriodAsync(userId, TransactionType.Income,  monthBeforeStart, monthBeforeEnd);
+        var spendingMonthBeforeTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId, TransactionType.Expense, monthBeforeStart, monthBeforeEnd);
+
         var allTransactionsTask =  _transactionService.GetAllAsync(userId);
 
         await Task.WhenAll(
             totalBalanceTask,
-            incomeThisMonthTask,incomeLastMonthTask,
-            spendingThisMonthTask,spendingLastMonthTask,
+            incomeRangeTask,          spendingRangeTask,
+            incomeThisMonthTask,      spendingThisMonthTask,
+            incomeLastMonthTask,      spendingLastMonthTask,
+            incomeMonthBeforeTask,    spendingMonthBeforeTask,
             allTransactionsTask
         );
 
         var totalBalance= totalBalanceTask.Result;
-        var incomeThisMonth= incomeThisMonthTask.Result;
-        var incomeLastMonth= incomeLastMonthTask.Result;
-        var spendingThisMonth=spendingThisMonthTask.Result;
-        var spendingLastMonth= spendingLastMonthTask.Result;
-        var allTransactions=allTransactionsTask.Result;
+        var incomeRange= incomeRangeTask.Result;
+        var spendingRange= spendingRangeTask.Result;
 
-        var incomeChange = CalculatePercentageChange(incomeLastMonth,incomeThisMonth);
-        var spendingChange = CalculatePercentageChange(spendingLastMonth,spendingThisMonth);
+        var incomeThisMonth     = incomeThisMonthTask.Result;
+        var spendingThisMonth   = spendingThisMonthTask.Result;
+        var incomeLastMonth     = incomeLastMonthTask.Result;
+        var spendingLastMonth   = spendingLastMonthTask.Result;
+        var incomeMonthBefore   = incomeMonthBeforeTask.Result;
+        var spendingMonthBefore = spendingMonthBeforeTask.Result;
+        var allTransactions     = allTransactionsTask.Result;
+
+        Console.WriteLine($"Balance:{totalBalance} | IncomeRange:{incomeRange} | SpendingRange:{spendingRange} | IncomeThisMonth:{incomeThisMonth} | SpendingThisMonth:{spendingThisMonth} | IncomeLastMonth:{incomeLastMonth} | SpendingLastMonth:{spendingLastMonth} | IncomeMonthBefore:{incomeMonthBefore} | SpendingMonthBefore:{spendingMonthBefore} | Transactions:{allTransactions.Count}");
+        
+
+        var lastMonthBalance= totalBalance -incomeThisMonth + spendingThisMonth;
+        var balanceChange=CalculatePercentageChange(lastMonthBalance,totalBalance);
+
+        var incomeChange=CalculatePercentageChange(incomeMonthBefore,incomeLastMonth);
+        var spendingChange= CalculatePercentageChange(spendingMonthBefore,spendingLastMonth);
 
         return new DashboardOverviewDto
         {
-            SummaryCards=BuildSummaryCards(totalBalance,incomeThisMonth,incomeChange,spendingThisMonth,spendingChange),
+            SummaryCards=BuildSummaryCards(totalBalance,balanceChange,incomeRange,incomeChange,spendingRange,spendingChange,rangeLabel),
             BalanceOverviewChart = BuildBalanceOverviewChart(allTransactions,balanceRangeInMonths),
             AllSpending = BuildAllSpending(allTransactions),
             RecentTransactions = BuildRecentTransactions(allTransactions)
         };        
     }
 
-    private static IReadOnlyList<SummaryCardDto> BuildSummaryCards(decimal totalBalance,decimal incomeThisMonth,decimal incomeChange,decimal spendingThisMonth,decimal spendingChange)
+    private static IReadOnlyList<SummaryCardDto> BuildSummaryCards(decimal totalBalance,decimal balanceChange,decimal incomeRange,decimal incomeChange,decimal spendingRange,decimal spendingChange,string rangeLabel)
     {
-        var now= DateTime.UtcNow.ToString("MMM yyyy");
-
         return new List<SummaryCardDto>
         {
             new()
@@ -74,27 +100,36 @@ public class DashboardService : IDashboardService
                 Key="totalBalance",
                 Title="Total Balance",
                 Amount=totalBalance,
-                PercentageChange=0, 
-                ComparisonLabel="All Wallets",
-                DateRange=now
+                PercentageChange=Math.Abs(balanceChange),
+                IsPositiveTrend=balanceChange >=0,
+                ComparisonLabel=balanceChange >= 0
+                    ? $"+ {Math.Abs(balanceChange)}% Last Month"
+                    : $"- {Math.Abs(balanceChange)}% Last Month",
+                DateRange        = rangeLabel
             },
             new()
             {
                 Key="totalIncome",
                 Title="Total Income",
-                Amount= incomeThisMonth,
+                Amount= incomeRange,
                 PercentageChange=Math.Abs(incomeChange), 
-                ComparisonLabel=incomeChange >= 0 ? "▲ vs last month" : "▼ vs last month",
-                DateRange=now
+                IsPositiveTrend  = incomeChange >= 0,
+                ComparisonLabel=incomeChange >= 0
+                    ? $"+ {Math.Abs(incomeChange)}% Last Month"
+                    : $"- {Math.Abs(incomeChange)}% Last Month",
+                DateRange        = rangeLabel
             },
             new()
             {
                 Key="totalSpending",
                 Title="Total Spending",
-                Amount=spendingThisMonth,
+                Amount=spendingRange,
                 PercentageChange=Math.Abs(spendingChange),
-                ComparisonLabel=spendingChange <= 0 ? "▲ vs last month" : "▼ vs last month",
-                DateRange=now
+                IsPositiveTrend  = spendingChange <= 0,
+                ComparisonLabel  = spendingChange <= 0
+                    ? $"+ {Math.Abs(spendingChange)}% Last Month"
+                    : $"- {Math.Abs(spendingChange)}% Last Month",
+                DateRange        = rangeLabel
             }
         };
     }

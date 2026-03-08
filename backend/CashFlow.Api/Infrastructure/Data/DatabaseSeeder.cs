@@ -20,6 +20,8 @@ public static class DatabaseSeeder
         };
 
         await context.Users.AddAsync(testUser);
+        await context.SaveChangesAsync();
+        Console.WriteLine("User Seeded");
 
         var wallets=new List<Wallet>
         {
@@ -56,10 +58,14 @@ public static class DatabaseSeeder
         },
         };
         await context.Wallets.AddRangeAsync(wallets);
+        await context.SaveChangesAsync();
+        Console.WriteLine("Wallets Seeded");
 
         
         var transactions=GetSeedTransactions();
         await context.Transactions.AddRangeAsync(transactions);
+        await context.SaveChangesAsync();
+        Console.WriteLine($"Transactions seeded: {transactions.Count} created");
 
         await context.SaveChangesAsync();
 
