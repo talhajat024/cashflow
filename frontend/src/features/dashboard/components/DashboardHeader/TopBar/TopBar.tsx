@@ -1,15 +1,14 @@
 import { Search, Mail, Bell } from 'lucide-react'
-import { Avatar } from '../../../../shared/ui'
-import { CashflowLogo } from '../../../../shared/ui/logo'
-import { Badge } from '../../../../shared/ui/badge/Badge'
+import { CashflowLogo } from '../../../../../shared/ui/logo'
+import { Badge } from '../../../../../shared/ui/badge/Badge'
 import { NavLink,Link } from 'react-router-dom'
-import { useSearch } from '../../../search/hooks/useSearch'
-import { SearchModal } from '../../../search/components/SearchModal'
+import { useSearch } from '../../../../search/hooks/useSearch'
+import { SearchModal } from '../../../../search/components/SearchModal'
 import { useEffect, useRef ,useState} from 'react'
-import { NotificationsPanel } from '../../../notifications/components/NotificationsPanel';
-import { useNotifications } from '../../../notifications/hooks/useNotifications'
-import InboxDropdown from './InboxDropdown';
-import { UserMenu } from '../../../user/components/UserMenu/UserMenu'
+import { NotificationsPanel } from '../../../../notifications/components/NotificationsPanel';
+import { useNotifications } from '../../../../notifications/hooks/useNotifications'
+import InboxDropdown from '../InboxDropdown/InboxDropdown';
+import { UserMenu } from '../../../../user/components/UserMenu/UserMenu'
 
 const layout = {
   inner:
@@ -38,14 +37,14 @@ const search = {
 const actions = {
   iconGroup: 'flex items-center gap-6',
   iconButton: 'relative flex items-center justify-center text-white/90 hover:text-white transition p-1', 
-  dot: 'absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500',
+  dot: 'absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500',
   badge: `
-    absolute -top-1 -right-1 
-    min-w-[18px] h-[18px] 
-    flex items-center justify-center
-    px-1 text-xs font-bold text-white 
-    bg-red-500 rounded-full
-    shadow-lg border-2 border-white
+     absolute -top-1 -right-1 
+  min-w-[18px] h-[18px] 
+  flex items-center justify-center
+  px-1 text-xs font-medium text-white 
+  bg-red-500 rounded-full
+  shadow-lg
   `,
 }
 
@@ -112,13 +111,11 @@ export const TopBar = () => {
     <>
     <section >
       <div className={layout.inner}>
-        {/* LEFT — Brand */}
         <Link to="/dashboard/overview" state={{scroll:"reset"}} className={brand.wrapper} aria-label='Go to dashboard'>
         <CashflowLogo />
         <span className={brand.text}>CashFlow</span>
         </Link>
 
-        {/* CENTER — Navigation */}
         <nav className={navigation.wrapper} aria-label="Main navigation">
           {NAV_ITEMS.map(({label,to})=>(
             <NavLink key={to} to={to} className={({isActive})=>

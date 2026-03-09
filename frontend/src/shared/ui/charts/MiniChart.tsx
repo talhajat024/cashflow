@@ -1,43 +1,70 @@
-  type MiniChartProps = {
-    data: [number, number, number];
-  };
+type MiniChartProps = {
+  data: [number, number, number];
+};
 
-  export function MiniChart({ data }: MiniChartProps) {
-  const width = 64;  // Reduced to eliminate right space
-  const height = 40;
-  const paddingBottom = 4;
-
-  const barWidth = 10;
-  const barGap = 8;
-  const startX = 4;  // Reduced left padding
+export function MiniChart({ data }: MiniChartProps) {
+  const width         = 80;
+  const height        = 52;
+  const paddingBottom = 2;
+  const paddingTop    = 4;
+  const barWidth      = 8;   
+  const barGap        = 12;  
+  const startX        = 4;
 
   const maxValue = Math.max(...data);
 
   const scaleY = (value: number) =>
-    (value / maxValue) * (height - paddingBottom - 6);
-
-  const BAR_COLORS = ["#F87171", "#6366F1", "#22D3EE"];
+    (value / maxValue) * (height - paddingBottom - paddingTop);
 
   const bars = data.map((value, i) => {
     const barHeight = scaleY(value);
     const x = startX + i * (barWidth + barGap);
     const y = height - barHeight - paddingBottom;
-    return { x, y, barHeight, color: BAR_COLORS[i] };
+    return { x, y, barHeight, centerX: startX + i * (barWidth + barGap) + barWidth / 2 };
   });
 
+  
+  const p0 = { x: bars[0].centerX, y: height - paddingBottom };           
+  const p1 = { x: bars[1].centerX, y: bars[1].y + bars[1].barHeight / 2 }; 
+  const p2 = { x: bars[2].centerX, y: bars[2].y };                        
+
   const linePath = `
-    M ${bars[0].x + barWidth / 2} ${bars[0].y}
-    Q ${bars[1].x + barWidth / 2} ${bars[1].y},
-      ${bars[2].x + barWidth / 2} ${bars[2].y}
+    M ${p0.x} ${p0.y}
+    C ${p0.x} ${p0.y - (p0.y - p1.y) * 0.4},
+      ${p1.x - 4} ${p1.y},
+      ${p1.x} ${p1.y}
+    C ${p1.x + 4} ${p1.y},
+      ${p2.x} ${p2.y + (p1.y - p2.y) * 0.4},
+      ${p2.x} ${p2.y}
   `;
 
   return (
-    <svg 
-      width={width} 
-      height={height} 
+    <svg
+      width={width}
+      height={height}
       viewBox={`0 0 ${width} ${height}`}
-      style={{ display: 'block' }} // Removes any inline spacing
+      style={{ display: "block" }}
     >
+      <defs>
+        
+        <linearGradient id="grad0" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#FB7185" />
+          <stop offset="100%" stopColor="#F43F5E" stopOpacity="0.5" />
+        </linearGradient>
+
+       
+        <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#A78BFA" />
+          <stop offset="100%" stopColor="#6366F1" stopOpacity="0.5" />
+        </linearGradient>
+
+        
+        <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0.5" />
+        </linearGradient>
+      </defs>
+
       {bars.map((bar, i) => (
         <rect
           key={i}
@@ -46,27 +73,28 @@
           width={barWidth}
           height={bar.barHeight}
           rx="3"
-          fill={bar.color}
-          opacity={0.7}
+          fill={`url(#grad${i})`}
         />
       ))}
 
       <path
         d={linePath}
-        stroke="#6366F1"
-        strokeWidth="2"
+        stroke="#818CF8"
+        strokeWidth="1.5"
+        fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity={0.9}
+        opacity="0.8"
       />
 
       <circle
-        cx={bars[1].x + barWidth / 2}
-        cy={bars[1].y}
-        r="3"
+        cx={p1.x}
+        cy={p1.y}
+        r="2.8"
         fill="#FFFFFF"
-        stroke="#6366F1"
-        strokeWidth="1.2"
+        stroke="#818CF8"
+        strokeWidth="1.5"
+        opacity="0.9"
       />
     </svg>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { InboxMessage } from "../../types/inbox.types";
-import { fetchInboxMessages } from "../../api/inbox.api";
-import Dropdown from "../../../../shared/ui/dropdown/Dropdown";
+import type { InboxMessage } from "../../../types/inbox.types";
+import { fetchInboxMessages } from "../../../api/inbox.api";
+import Dropdown from "../../../../../shared/ui/dropdown/Dropdown";
 import {
   messageList,
   messageItem,

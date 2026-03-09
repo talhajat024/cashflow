@@ -1,6 +1,6 @@
-import { TopBar } from './TopBar';
-import { WelcomeSection } from './WelcomeSection';
-import { HeaderTabs } from './HeaderTabs';
+import { TopBar } from './TopBar/TopBar';
+import { WelcomeSection } from './WelcomeSection/WelcomeSection';
+import { HeaderTabs } from './HeaderTabs/HeaderTabs';
 import { useLocation } from 'react-router-dom';
 
 type DashboardHeaderProps={

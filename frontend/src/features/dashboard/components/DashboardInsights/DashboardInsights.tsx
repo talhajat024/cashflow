@@ -25,7 +25,7 @@ export function DashboardInsights({
             <div className="col-span-2">
                 <BalanceOverview title="Balance Overview"
                chart={balanceChart}
-               range={balanceRange as '3' | '6' | '12' | '24'}
+               range={balanceRange as '3' | '6' | '12' }
         onRangeChange={onBalanceRangeChange}/>
             </div>
             <div className="col-span-1">

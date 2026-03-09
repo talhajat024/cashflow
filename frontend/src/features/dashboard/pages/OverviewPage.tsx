@@ -44,7 +44,7 @@ export default function OverviewPage() {
 
 
       {data && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pb-4">
           <OverviewStats cards={data.summaryCards} />
 
           <DashboardInsights

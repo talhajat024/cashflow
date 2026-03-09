@@ -2,8 +2,8 @@ import { StatCard } from "../StatCard";
 import { statsWrapper, statsGrid } from "./OverviewStats.styles";
 import {
   Wallet,
-  TrendingUp,
-  TrendingDown,
+  CircleDollarSign,
+  BanknoteArrowDown,
 } from "lucide-react";
 
 import type { SummaryCard } from "../../types/dashboard.types";
@@ -14,8 +14,8 @@ type OverviewStatsProps = {
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   totalBalance: <Wallet size={18} />,
-  totalIncome: <TrendingUp size={18} />,
-  totalSpending: <TrendingDown size={18} />,
+  totalIncome: <CircleDollarSign size={18} />,
+  totalSpending: <BanknoteArrowDown size={18} />,
 };
 
 const TONE_MAP: Record<string, "blue" | "green" | "red"> = {

@@ -12,7 +12,7 @@ export function Avatar({
   size = 30,
 }: AvatarProps) {
   return (
-    <div className="flex items-center gap-2 cursor-pointer">
+    <div className="flex items-center gap-1 cursor-pointer">
       <div
         className="rounded-full overflow-hidden bg-gray-200 flex items-center justify-center"
         style={{ width: size, height: size }}
@@ -20,7 +20,7 @@ export function Avatar({
         {src ? (
           <img src={src} alt={alt} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-sm font-medium text-gray-600">A</span>
+          <span className="text-sm font-medium text-gray-600">T</span>
         )}
       </div>
 

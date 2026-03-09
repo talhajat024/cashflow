@@ -79,7 +79,7 @@ export const UserMenu=()=>{
             <div className={styles.container()}>
                 <button className={styles.avatarButton()} disabled>
                     <Avatar
-                    size={32}/>
+                    size={28}/>
                 <div className={styles.loadingContainer()}>
                     <div className={styles.loadingSpinner()}/>
                 </div>
@@ -102,19 +102,17 @@ export const UserMenu=()=>{
                 aria-haspopup="true">
                         <Avatar src={user.avatar}
                        alt={user.name}
-                        size={32}/>
+                        size={28}/>
             </button>
 
-            {/* Dropdown Menu */}
             {isOpen && (
                 <div className={styles.dropdown()} role="menu" aria-label="User menu">
-                    {/* User Info */}
                     <div className={styles.userInfo()}>
                         <p className={styles.userName()}>{user.name}</p>
                         <p className={styles.userEmail()}>{user.email}</p>  
                     </div>
 
-                    {/* Account management */}
+                    
                     <div className={styles.menuSection()}>
                         <MenuItem
                         icon={<Settings size={16}/>}
@@ -134,7 +132,6 @@ export const UserMenu=()=>{
 
                     <div className={styles.divider()} />
 
-                {/* Financial */}
                 <div className={styles.menuSection()}>
                   <MenuItem 
                     icon={<Landmark size={16} />}
@@ -149,7 +146,6 @@ export const UserMenu=()=>{
                 </div>
                 <div className={styles.divider()} />
 
-                {/* Support */}
           <div className={styles.menuSection()}>
             <MenuItem 
               icon={<HelpCircle size={16} />}
@@ -160,7 +156,6 @@ export const UserMenu=()=>{
 
           <div className={styles.divider()} />
 
-          {/* Sign Out */}
           <div className={styles.menuSection()}>
             <MenuItem 
               icon={<LogOut size={16} />}
