@@ -9,44 +9,7 @@ import { NotificationsPanel } from '../../../../notifications/components/Notific
 import { useNotifications } from '../../../../notifications/hooks/useNotifications'
 import InboxDropdown from '../InboxDropdown/InboxDropdown';
 import { UserMenu } from '../../../../user/components/UserMenu/UserMenu'
-
-const layout = {
-  inner:
-    'flex h-[72px] items-center gap-10',
-}
-
-const brand = {
-  wrapper: 'flex items-center gap-2 text-white relative',
-  text: 'text-[20px] font-semibold tracking-wide text-slate-50',
-}
-
-const navigation = {
-  wrapper: 'flex h-full items-center gap-8 relative top-[1px]',
-  link:
-    'text-[14px] font-normal text-white/80 hover:text-white transition-colors',
-}
-
-const search = {
-  wrapper:
-    'flex items-center gap-2 rounded-[14px] bg-blue-500 px-4 h-[44px] mr-6',
-  icon: 'h-4 w-4 text-white/80',
-  input:
-    'w-[160px] bg-transparent text-[14px] font-normal text-white placeholder-white/70 outline-none',
-}
-
-const actions = {
-  iconGroup: 'flex items-center gap-6',
-  iconButton: 'relative flex items-center justify-center text-white/90 hover:text-white transition p-1', 
-  dot: 'absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500',
-  badge: `
-     absolute -top-1 -right-1 
-  min-w-[18px] h-[18px] 
-  flex items-center justify-center
-  px-1 text-xs font-medium text-white 
-  bg-red-500 rounded-full
-  shadow-lg
-  `,
-}
+import { styles } from './TopBar.styles'
 
 const NAV_ITEMS=[
   {label:'Dashboard',to:'/dashboard'},
@@ -110,26 +73,26 @@ export const TopBar = () => {
   return (
     <>
     <section >
-      <div className={layout.inner}>
-        <Link to="/dashboard/overview" state={{scroll:"reset"}} className={brand.wrapper} aria-label='Go to dashboard'>
+      <div className={styles.inner()}>
+        <Link to="/dashboard/overview" state={{scroll:"reset"}} className={styles.brandWrapper()} aria-label='Go to dashboard'>
         <CashflowLogo />
-        <span className={brand.text}>CashFlow</span>
+        <span className={styles.brandText()}>CashFlow</span>
         </Link>
 
-        <nav className={navigation.wrapper} aria-label="Main navigation">
+        <nav className={styles.navWrapper()} aria-label="Main navigation">
           {NAV_ITEMS.map(({label,to})=>(
             <NavLink key={to} to={to} className={({isActive})=>
             isActive ? 'text-white font-normal border-white'
-          : navigation.link}>{label}</NavLink>
+          : styles.navLink()}>{label}</NavLink>
           ))}
         </nav>
 
     <div className="ml-auto mr-4">
-      <div className={search.wrapper}>
-        <Search className={search.icon} />
+      <div className={styles.searchWrapper()}>
+        <Search className={styles.searchIcon()} />
         <input
         ref={searchTriggerRef}
-          className={search.input}
+          className={styles.searchInput()}
           placeholder="Search anything..."
           readOnly
           onClick={open}
@@ -138,12 +101,12 @@ export const TopBar = () => {
       </div>
     </div>
 
-    <div className={actions.iconGroup}>
+    <div className={styles.iconGroup()}>
       <InboxDropdown
       trigger={
-         <div className={actions.iconButton}>
+         <div className={styles.iconButton()}>
       <Mail className="h-5 w-5" />
-      <span className={actions.dot} />
+      <span className={styles.dot()} />
     </div>
       }>
     </InboxDropdown>
@@ -152,17 +115,17 @@ export const TopBar = () => {
        <div className="relative" ref={notificationsRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className={actions.iconButton}
+                className={styles.iconButton()}
               >
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
                   <>
                     {unreadCount > 0 ? (
-                      <span className={actions.badge}>
+                      <span className={styles.badge()}>
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     ) : (
-                      <span className={actions.dot} />
+                      <span className={styles.dot()} />
                     )}
                   </>
                 )}

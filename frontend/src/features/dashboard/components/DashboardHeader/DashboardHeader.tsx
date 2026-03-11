@@ -2,6 +2,7 @@ import { TopBar } from './TopBar/TopBar';
 import { WelcomeSection } from './WelcomeSection/WelcomeSection';
 import { HeaderTabs } from './HeaderTabs/HeaderTabs';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../../../auth';
 
 type DashboardHeaderProps={
   scrolled?:boolean;
@@ -9,6 +10,7 @@ type DashboardHeaderProps={
 
 export const DashboardHeader = ({scrolled}:DashboardHeaderProps) => {
   const location= useLocation();
+  const {user}= useAuth();
   return (
     <header className={`
         sticky top-0 z-50 bg-primary
@@ -18,7 +20,7 @@ export const DashboardHeader = ({scrolled}:DashboardHeaderProps) => {
       <div className="mx-auto max-w-[1200px] px-8 pb-4 w-full">
         <TopBar />
         <div className="pt-3 flex items-center justify-between">
-          <WelcomeSection />
+          <WelcomeSection name={user?.name.split(' ')[0] ?? "there"}/>
           {location.pathname.startsWith('/dashboard') && <HeaderTabs />}
         </div>
       </div>
