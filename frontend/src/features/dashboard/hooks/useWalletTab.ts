@@ -19,6 +19,7 @@ export function useWalletTab()
         }
         catch(error)
         {
+            console.log("error is:",error);
             setError("Failed to load wallet data");
         }
         finally{
