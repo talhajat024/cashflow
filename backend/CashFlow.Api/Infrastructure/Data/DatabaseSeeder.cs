@@ -23,39 +23,65 @@ public static class DatabaseSeeder
         await context.SaveChangesAsync();
         Console.WriteLine("User Seeded");
 
-        var wallets=new List<Wallet>
+        var wallets = new List<Wallet>
         {
             new()
             {
-                 Id = SeedConstants.MainWalletId,      
-            UserId = SeedConstants.TestUserId,
-            Name = "Main Account",
-            Balance = 2500.00m,
-            Currency = "USD",
-            Icon = "bank",
-            IsDefault = true,
-            CreatedAt = DateTime.UtcNow
+                Id           = SeedConstants.MainWalletId,
+                UserId       = SeedConstants.TestUserId,
+                Name         = "Main Account",
+                Balance      = 20546.00m,
+                Currency     = "USD",
+                Icon         = "bank",
+                IsDefault    = true,
+                CreatedAt    = DateTime.UtcNow,
+            
+                CardNumber   = "**** **** **** 7256",
+                ExpireDate   = "08/27",
+                Cvc          = "***",
+                CardStatus   = "Active",
+               
+                CreditLimit  = 20909.90m,
+                UsedLimit    = 14567.90m,
             },
-            new() {
-            Id = SeedConstants.SavingsWalletId,   
-            UserId = SeedConstants.TestUserId,
-            Name = "Savings",
-            Balance = 1800.00m,
-            Currency = "USD",
-            Icon = "piggy-bank",
-            IsDefault = false,
-            CreatedAt = DateTime.UtcNow
-        },
-        new() {
-            Id = SeedConstants.CashWalletId,      
-            UserId = SeedConstants.TestUserId,
-            Name = "Cash",
-            Balance = 300.00m,
-            Currency = "USD",
-            Icon = "cash",
-            IsDefault = false,
-            CreatedAt = DateTime.UtcNow
-        },
+            new()
+            {
+                Id           = SeedConstants.SavingsWalletId,
+                UserId       = SeedConstants.TestUserId,
+                Name         = "Savings Account",
+                Balance      = 20546.00m,
+                Currency     = "USD",
+                Icon         = "piggy-bank",
+                IsDefault    = false,
+                CreatedAt    = DateTime.UtcNow,
+                
+                CardNumber   = "**** **** **** 3421",
+                ExpireDate   = "05/26",
+                Cvc          = "***",
+                CardStatus   = "Active",
+               
+                CreditLimit  = 15000.00m,
+                UsedLimit    = 8200.00m,
+            },
+            new()
+            {
+                Id           = SeedConstants.CashWalletId,
+                UserId       = SeedConstants.TestUserId,
+                Name         = "Cash Wallet",
+                Balance      = 20546.00m,
+                Currency     = "USD",
+                Icon         = "cash",
+                IsDefault    = false,
+                CreatedAt    = DateTime.UtcNow,
+                
+                CardNumber   = "**** **** **** 9182",
+                ExpireDate   = "12/25",
+                Cvc          = "***",
+                CardStatus   = "Inactive",
+                
+                CreditLimit  = 10000.00m,
+                UsedLimit    = 3100.00m,
+            },
         };
         await context.Wallets.AddRangeAsync(wallets);
         await context.SaveChangesAsync();

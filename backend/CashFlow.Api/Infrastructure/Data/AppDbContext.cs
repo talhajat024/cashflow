@@ -39,14 +39,39 @@ public class AppDbContext:DbContext
         modelBuilder.Entity<Wallet>(entity =>
         {
             entity.HasKey(w=> w.Id);
+
             entity.Property(w=> w.Balance)
             .HasColumnType("decimal(18,2)");
+
             entity.Property(w=> w.Name)
             .IsRequired()
             .HasMaxLength(100);
+
             entity.Property(w=> w.Currency)
             .HasDefaultValue("USD")
             .HasMaxLength(10);
+
+            // Card Details
+            entity.Property(w=> w.CardNumber)
+            .HasMaxLength(50);
+
+            entity.Property(w=> w.ExpireDate)
+            .HasMaxLength(10);
+
+            entity.Property(w=> w.Cvc)
+            .HasMaxLength(10);
+
+            entity.Property(w=> w.CardStatus)
+            .HasMaxLength(20)
+            .HasDefaultValue("Active");
+
+            // Card Limit
+            entity.Property(w=> w.CreditLimit)
+            .HasColumnType("decimal(18,2)");
+
+            entity.Property(w=> w.UsedLimit)
+            .HasColumnType("decimal(18,2)");
+
             entity.HasOne(w=> w.User)
             .WithMany()
             .HasForeignKey(w=> w.UserId)

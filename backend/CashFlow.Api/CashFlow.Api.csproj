@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="MailKit" Version="4.3.0" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
@@ -25,10 +26,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Application\Common\" />
     <Folder Include="Application\DTOs\Auth\" />
     <Folder Include="Application\DTOs\Dashboard\" />
+    <Folder Include="Application\DTOs\Wallets\" />
     <Folder Include="Application\Interfaces\" />
     <Folder Include="Application\Services\" />
+    <Folder Include="Application\Wallets\" />
+    <Folder Include="Application\Wallets\Commands\" />
+    <Folder Include="Application\Wallets\Commands\CreateWallet\" />
+    <Folder Include="Application\Wallets\Queries\" />
+    <Folder Include="Application\Wallets\Queries\GetWalletTab\" />
     <Folder Include="Controllers\" />
     <Folder Include="Domain\Entities\" />
     <Folder Include="Domain\Enums\" />
