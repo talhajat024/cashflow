@@ -56,7 +56,7 @@ export type WalletTabData={
         details:CardDetails;
         limit:CardLimit;
         statistics:BalanceStatistics;
-        lastTransactions:WalletTransaction[];
+        lastTransaction:WalletTransaction[];
     }
 }
 

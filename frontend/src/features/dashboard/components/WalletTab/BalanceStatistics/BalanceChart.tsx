@@ -1,5 +1,3 @@
-
-// features/dashboard/components/WalletTab/BalanceStatistics/BalanceChart.tsx
 import type { BalanceStatPoint } from "../../../types/wallet.types";
 
 type BalanceChartProps = {
@@ -10,12 +8,12 @@ type BalanceChartProps = {
   isPositive: boolean;
 };
 
-const VIEWBOX_WIDTH  = 720;
-const VIEWBOX_HEIGHT = 260;
-const PADDING_LEFT   = 50;
-const PADDING_RIGHT  = 20;
-const CHART_TOP      = 20;
-const CHART_BOTTOM   = 200;
+const VIEWBOX_WIDTH  = 660;
+const VIEWBOX_HEIGHT = 240;
+const PADDING_LEFT   = 40;
+const PADDING_RIGHT  = 16;
+const CHART_TOP      = 50;           
+const CHART_BOTTOM   = 190;
 const CHART_WIDTH    = VIEWBOX_WIDTH - PADDING_LEFT - PADDING_RIGHT;
 
 function buildSmoothPath(points: { x: number; y: number }[]) {
@@ -37,11 +35,16 @@ export function BalanceChart({
   changePercent,
   isPositive,
 }: BalanceChartProps) {
+
+  console.log("the props inside balance chart are:",data,activeMonth,activeAmount,changePercent,isPositive);
   const stepX    = CHART_WIDTH / (data.length - 1);
   const maxValue = Math.max(...data.map((d) => d.amount), 1);
 
+  // Round to nearest 10k for clean labels
+  const yMax = Math.ceil(maxValue / 10000) * 10000 || 10000;
+
   const normalizeY = (value: number) =>
-    CHART_BOTTOM - (value / maxValue) * (CHART_BOTTOM - CHART_TOP);
+    CHART_BOTTOM - (value / yMax) * (CHART_BOTTOM - CHART_TOP);
 
   const points = data.map((d, i) => ({
     x: PADDING_LEFT + i * stepX,
@@ -50,15 +53,14 @@ export function BalanceChart({
 
   const linePath = buildSmoothPath(points);
 
-  // ✅ Active point
   const activeIndex = data.findIndex((d) => d.month === activeMonth);
-  const activePoint = points[activeIndex] ?? points[Math.floor(points.length / 2)];
+  const activePoint = points[activeIndex] ?? points[points.length - 1];
 
-  // ✅ Y axis labels
-  const yLabels = [0, 0.25, 0.5, 0.75, 1].map((t) => ({
-    value: Math.round(maxValue * t),
-    y:     normalizeY(maxValue * t),
-  }));
+  // Y axis — 5 steps from 0 to yMax
+  const yLabels = Array.from({ length: 5 }, (_, i) => {
+    const value = (yMax / 4) * i;
+    return { value, y: normalizeY(value) };
+  });
 
   return (
     <svg
@@ -68,16 +70,13 @@ export function BalanceChart({
       fill="none"
     >
       <defs>
-        {/* ✅ Area fill gradient */}
-        <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#3B82F6" stopOpacity="0.15" />
+        <linearGradient id="walletAreaFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#3B82F6" stopOpacity="0.12" />
           <stop offset="100%" stopColor="#3B82F6" stopOpacity="0"    />
         </linearGradient>
-
-        {/* ✅ Vertical line gradient */}
-        <linearGradient id="verticalLine" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#3B82F6" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.1" />
+        <linearGradient id="walletVertLine" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#3B82F6" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.05" />
         </linearGradient>
       </defs>
 
@@ -85,15 +84,13 @@ export function BalanceChart({
       {yLabels.map((label, i) => (
         <text
           key={i}
-          x={PADDING_LEFT - 8}
+          x={PADDING_LEFT - 6}
           y={label.y + 4}
-          fontSize="11"
+          fontSize="10"
           fill="#9CA3AF"
           textAnchor="end"
         >
-          {label.value >= 1000
-            ? `${Math.round(label.value / 1000)}k`
-            : label.value}
+          {label.value === 0 ? "0k" : `${Math.round(label.value / 1000)}k`}
         </text>
       ))}
 
@@ -106,7 +103,7 @@ export function BalanceChart({
           x2={VIEWBOX_WIDTH - PADDING_RIGHT}
           y2={label.y}
           stroke="#E5E7EB"
-          strokeOpacity="0.6"
+          strokeOpacity="0.8"
           strokeDasharray="4 4"
         />
       ))}
@@ -114,14 +111,14 @@ export function BalanceChart({
       {/* ── Area Fill ── */}
       <path
         d={`${linePath} L ${points.at(-1)?.x} ${CHART_BOTTOM} L ${points[0].x} ${CHART_BOTTOM} Z`}
-        fill="url(#areaFill)"
+        fill="url(#walletAreaFill)"
       />
 
       {/* ── Line ── */}
       <path
         d={linePath}
         stroke="#3B82F6"
-        strokeWidth="2.5"
+        strokeWidth="2"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -133,26 +130,26 @@ export function BalanceChart({
         y1={CHART_TOP}
         x2={activePoint.x}
         y2={CHART_BOTTOM}
-        stroke="url(#verticalLine)"
-        strokeWidth="1.5"
+        stroke="url(#walletVertLine)"
+        strokeWidth="1.2"
       />
 
-      {/* ── Active Tooltip ── */}
+      {/* ── Tooltip ── */}
       <g>
         <rect
-          x={activePoint.x - 36}
-          y={activePoint.y - 52}
-          width="82"
-          height="44"
-          rx="8"
+          x={activePoint.x - 30}
+          y={activePoint.y - 62}
+          width="72"
+          height="50"
+          rx="6"
           fill="white"
-          filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"
+          filter="drop-shadow(0 2px 6px rgba(0,0,0,0.10))"
         />
-        {/* Month label */}
+        {/* Month */}
         <text
-          x={activePoint.x + 5}
-          y={activePoint.y - 34}
-          fontSize="11"
+          x={activePoint.x + 6}
+          y={activePoint.y - 46}
+          fontSize="9"
           fill="#6B7280"
           textAnchor="middle"
         >
@@ -160,20 +157,20 @@ export function BalanceChart({
         </text>
         {/* Amount */}
         <text
-          x={activePoint.x + 5}
-          y={activePoint.y - 18}
-          fontSize="11"
+          x={activePoint.x + 6}
+          y={activePoint.y - 32}
+          fontSize="10"
           fontWeight="600"
           fill="#111827"
           textAnchor="middle"
         >
           ${activeAmount.toLocaleString()}
         </text>
-        {/* Change % */}
+        {/* % Change */}
         <text
-          x={activePoint.x + 5}
-          y={activePoint.y - 4}
-          fontSize="10"
+          x={activePoint.x + 6}
+          y={activePoint.y - 18}
+          fontSize="9"
           fill={isPositive ? "#10B981" : "#EF4444"}
           textAnchor="middle"
         >
@@ -185,10 +182,10 @@ export function BalanceChart({
       <circle
         cx={activePoint.x}
         cy={activePoint.y}
-        r="6"
+        r="5"
         fill="#3B82F6"
         stroke="#FFFFFF"
-        strokeWidth="2.5"
+        strokeWidth="2"
       />
 
       {/* ── X Axis Labels ── */}
@@ -196,8 +193,8 @@ export function BalanceChart({
         <text
           key={i}
           x={PADDING_LEFT + i * stepX}
-          y={CHART_BOTTOM + 24}
-          fontSize="11"
+          y={CHART_BOTTOM + 18}
+          fontSize="10"
           fill={d.month === activeMonth ? "#3B82F6" : "#9CA3AF"}
           fontWeight={d.month === activeMonth ? "600" : "400"}
           textAnchor="middle"

@@ -1,35 +1,26 @@
 import { tv } from "tailwind-variants";
 
 export const walletCard = tv({
-    slots:{
-        container: `
-      relative flex flex-col justify-between
-      rounded-2xl p-5 cursor-pointer
-      min-w-[280px] h-[140px]
+  slots: {
+    container: `
+      flex flex-col flex-1
+      rounded-2xl overflow-hidden
+      cursor-pointer select-none
       transition-all duration-200
-      select-none
     `,
-    topRow:    "flex items-start justify-between",
-    label:     "text-[11px] font-normal text-white/60 uppercase tracking-wider",
-    name:      "text-[16px] font-semibold text-white mt-1",
-    number:    "text-[14px] font-medium text-white mt-1 text-right",
-    bottomRow: "flex items-end justify-between",
-    balanceLabel: "text-[11px] font-normal text-white/60 uppercase tracking-wider",
-    balanceAmount:"text-[20px] font-bold text-white mt-1",
-    mastercardWrapper: "flex items-center",
-    circle1: "w-8 h-8 rounded-full bg-red-500 opacity-90",
-    circle2: "w-8 h-8 rounded-full bg-yellow-400 opacity-90 -ml-4",
-    },
-    variants: {
-    selected: {
-      true: {
-        container: "scale-[1.02] shadow-2xl ring-2 ring-white/30",
-      },
-      false: {
-        container: "opacity-90 hover:opacity-100 hover:scale-[1.01]",
-      }
-    }
-  }
+    gradientSection: `px-5 pt-4 pb-5`,
+    topRow:          `flex items-start justify-between`,
+    label:           `text-[11px] font-normal text-white/60 uppercase tracking-wider mb-1`,
+    name:            `text-[16px] font-semibold text-white`,
+    number:          `text-[14px] font-medium text-white`,
+    whiteSection:    `flex items-center justify-between bg-white px-5 py-4`,
+    balanceLabel:    `text-[11px] font-normal text-gray-400 uppercase tracking-wider mb-1`,
+    balanceAmount:   `text-[20px] font-bold text-gray-900`,
+    mastercardWrapper: `flex items-center`,
+    circle1:         `w-9 h-9 rounded-full bg-red-500 opacity-90`,
+    circle2:         `w-9 h-9 rounded-full bg-yellow-400 opacity-90 -ml-4`,
+  },
+ 
 });
 
-export const styles= walletCard();
+export const styles = walletCard();

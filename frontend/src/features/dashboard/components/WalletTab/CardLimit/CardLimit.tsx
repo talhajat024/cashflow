@@ -30,6 +30,7 @@ export function CardLimit({limit,period,onPeriodChange}:CardLimitProps){
             </CardHeader>
 
             <CardContent>
+              <div className={styles.contentBox()}>
         <div className={styles.amountRow()}>
           <span className={styles.usedAmount()}>
             ${limit.used.toLocaleString("en-US", { minimumFractionDigits: 2 })}
@@ -47,7 +48,7 @@ export function CardLimit({limit,period,onPeriodChange}:CardLimitProps){
             style={{
               width:           `${usedPercent}%`,
               backgroundColor: PROGRESS_COLORS[0],
-              flexShrink:      0,
+              maxWidth:      "65%",
             }}
           />
           
@@ -56,7 +57,7 @@ export function CardLimit({limit,period,onPeriodChange}:CardLimitProps){
             style={{
               width:           `${remainPercent * 0.55}%`,
               backgroundColor: PROGRESS_COLORS[1],
-              flexShrink:      0,
+              maxWidth:"20%",
             }}
           />
          
@@ -65,10 +66,11 @@ export function CardLimit({limit,period,onPeriodChange}:CardLimitProps){
             style={{
               width:           `${remainPercent * 0.45}%`,
               backgroundColor: PROGRESS_COLORS[2],
-              flexShrink:      0,
+              maxWidth:      "15%",
             }}
           />
         </div>
+         </div>
       </CardContent>
         </Card>
     )

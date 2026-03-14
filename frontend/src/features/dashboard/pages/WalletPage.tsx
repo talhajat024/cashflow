@@ -32,18 +32,19 @@ export default function WalletPage() {
         onSelect={handleWalletSelect}
       />
 
-      <CardDetails details={selectedWallet.details} />
-
       <div className="grid grid-cols-2 gap-6">
+        <CardDetails details={selectedWallet.details} />
         <CardLimit
           limit={selectedWallet.limit}
           period={limitPeriod}
           onPeriodChange={setLimitPeriod}
         />
-        <LastTransaction transactions={selectedWallet.lastTransactions} />
       </div>
 
-      <BalanceStatistics statistics={selectedWallet.statistics} />
+       <div className="grid grid-cols-2 gap-6 items-start">
+        <BalanceStatistics statistics={selectedWallet.statistics} />
+        <LastTransaction transactions={selectedWallet.lastTransaction} />
+      </div>
 
     </div>
   );

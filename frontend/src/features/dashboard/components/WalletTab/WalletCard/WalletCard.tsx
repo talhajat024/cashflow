@@ -1,10 +1,16 @@
-import { walletCard } from "./WalletCard.styles";
+import { styles } from "./WalletCard.styles";
 import type { Wallet } from "../../../types/wallet.types";
 
-const CARD_GRADIENTS=[
-    "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
-  "linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)",
-  "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
+// WalletCard.tsx
+const CARD_GRADIENTS = [
+  `radial-gradient(circle at 85% 85%, rgba(34, 211, 238, 0.5) 0%, transparent 50%),
+   linear-gradient(to right, #89C4FF 0%, #4B8EF5 50%, #3B6FE8 100%)`,
+
+  `radial-gradient(circle at 85% 85%, rgba(167, 139, 250, 0.6) 0%, transparent 50%),
+   linear-gradient(to right, #89C4FF 0%, #4B8EF5 50%, #3B6FE8 100%)`,
+
+  `radial-gradient(circle at 85% 85%, rgba(251, 146, 60, 0.55) 0%, transparent 50%),
+   linear-gradient(to right, #89C4FF 0%, #4B8EF5 50%, #3B6FE8 100%)`,
 ];
 
 type WalletCardProps={
@@ -16,42 +22,47 @@ type WalletCardProps={
 
 export function WalletCard({wallet,index,isSelected,onSelect}:WalletCardProps)
 {
-    const s = walletCard({selected:isSelected});
     const gradient= CARD_GRADIENTS[index % CARD_GRADIENTS.length];
 
     return (
-        <div className={s.container()}
+        <div 
+        className={styles.container()}
         style={{background:gradient}}
         onClick={()=> onSelect(wallet.id)}
         role="button"
         tabIndex={0}
-        onKeyDown={(e)=> e.key === 'Enter' && onSelect(wallet.id)}
-        aria-pressed={isSelected}>
+        onKeyDown={(e)=> e.key === 'Enter' && onSelect(wallet.id)}>
+
+            <div
+        className={styles.gradientSection()}
+        style={{ background: gradient }}
+      >
             {/* Top Row */}
-            <div className={s.topRow()}>
+            <div className={styles.topRow()}>
                 <div>
-                    <p className={s.label()}>Name</p>
-                    <p className={s.name()}>{wallet.name}</p>
+                    <p className={styles.label()}>Name</p>
+                    <p className={styles.name()}>{wallet.name}</p>
                 </div>
 
-                <div className="text-right">
-                <p className={s.label()}>Number</p>
-                <p className={s.number()}>{wallet.number}</p>
+                <div>
+                <p className={styles.label()}>Number</p>
+                <p className={styles.number()}>{wallet.number}</p>
                 </div>
+            </div>
             </div>
 
             {/* Bottom Row */}
-            <div className={s.bottomRow()}>
+            <div className={styles.whiteSection()}>
                 <div>
-                    <p className={s.balanceLabel()}>Balance</p>
-                    <p className={s.balanceAmount()}>
+                    <p className={styles.balanceLabel()}>Balance</p>
+                    <p className={styles.balanceAmount()}>
                         ${wallet.balance.toLocaleString("en-US",{minimumFractionDigits:2})}
                     </p>
                 </div>
 
-                <div className={s.mastercardWrapper()}>
-                    <div className={s.circle1()}/>
-                    <div className={s.circle2()}/>
+                <div className={styles.mastercardWrapper()}>
+                    <div className={styles.circle1()}/>
+                    <div className={styles.circle2()}/>
                 </div>
             </div>
         </div>
