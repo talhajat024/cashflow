@@ -13,4 +13,5 @@ public class DashboardOverviewDto
     public AllSpendingDto AllSpending { get; set; } = new();
     
     public List<TransactionDto> RecentTransactions { get; set; } = [];
+    public string InsightText {get;set;} =string.Empty;
 }

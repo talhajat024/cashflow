@@ -89,15 +89,20 @@ public class GetWalletTabHandler:IRequestHandler<GetWalletTabQuery,Result<GetWal
 
     private static BalanceStatisticsDto BuildStatistics(IEnumerable<Domain.Entities.Transaction> transactions)
     {
-        var now= DateTime.UtcNow;
-        var months=Enumerable.Range(0,10)
-        .Select(i=> now.AddMonths(-(9-i)))
+        var now = DateTime.UtcNow;
+
+        var startMonths = new DateTime(now.Year,1,1);
+
+        var months= Enumerable.Range(0,10)
+        .Select(i=> startMonths.AddMonths(i))
         .ToList();
 
+        Console.WriteLine($"Months: {string.Join(", ", months.Select(m => m.ToString("MMM yyyy")))}");
+
         // Income - Spending per month = net balance point
-        var data= months.Select(m=>
+        var data = months.Select(m=>
         {
-            var monthTx=transactions.Where(t=> t.Date.Year == m.Year  && t.Date.Month == m.Month).ToList();
+            var monthTx = transactions.Where(t=> t.Date.Year == m.Year  && t.Date.Month == m.Month).ToList();
 
             var income = monthTx.Where(t=> t.Type == TransactionType.Income).Sum(t=> t.Amount);
             var spending = monthTx.Where(t=> t.Type == TransactionType.Expense).Sum(t=> t.Amount);
@@ -109,8 +114,8 @@ public class GetWalletTabHandler:IRequestHandler<GetWalletTabQuery,Result<GetWal
             };
         }).ToList();
 
-        // Active Month = curent month
-        var activeMonth= now.ToString("MMM");
+        // Active Month = current month
+        var activeMonth = now.ToString("MMM");
         var activePoint = data.FirstOrDefault(d=> d.Month == activeMonth);
         var activeAmount = activePoint?.Amount ?? 0;
 
@@ -123,6 +128,7 @@ public class GetWalletTabHandler:IRequestHandler<GetWalletTabQuery,Result<GetWal
         {
             Data = data,
             ActiveMonth=activeMonth,
+            ActiveYear = now.Year,
             ActiveAmount=activeAmount,
             ChangePercent=Math.Abs(changePercent),
             IsPositive=changePercent >= 0,

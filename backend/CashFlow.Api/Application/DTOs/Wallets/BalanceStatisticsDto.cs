@@ -5,6 +5,7 @@ public class BalanceStatisticsDto
 {
     public List<BalanceStatPointDto> Data {get;set;}=[];
     public string ActiveMonth {get;set;}=string.Empty;
+    public int ActiveYear {get;set;}
     public decimal ActiveAmount {get;set;}
     public decimal ChangePercent {get;set;}
     public bool IsPositive {get;set;}

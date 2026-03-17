@@ -13,10 +13,12 @@ public class DashboardService : IDashboardService
 {
     private readonly ITransactionService _transactionService;
     private readonly IWalletService _walletService;
-    public DashboardService(ITransactionService transactionService,IWalletService walletService)
+    private readonly IInsightService _insightService;
+    public DashboardService(ITransactionService transactionService,IWalletService walletService,IInsightService insightService)
     {
         _transactionService=transactionService;
         _walletService=walletService;
+        _insightService= insightService;
     }
 
     public async Task<DashboardOverviewDto> GetOverviewAsync(Guid userId,int balanceRangeInMonths)
@@ -37,19 +39,14 @@ public class DashboardService : IDashboardService
         var monthBeforeEnd= lastMonthStart.AddDays(-1);
 
         var totalBalanceTask = _walletService.GetTotalBalanceAsync(userId);
-
         var incomeRangeTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,rangeStart,rangeEnd);
         var spendingRangeTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,rangeStart,rangeEnd); 
-
         var incomeThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,thisMonthStart,thisMonthEnd); 
         var spendingThisMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,thisMonthStart,thisMonthEnd); 
-
         var incomeLastMonthTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Income,lastMonthStart,lastMonthEnd);
         var spendingLastMonthTask= _transactionService.GetTotalByTypeAndPeriodAsync(userId,TransactionType.Expense,lastMonthStart,lastMonthEnd);
-
         var incomeMonthBeforeTask   = _transactionService.GetTotalByTypeAndPeriodAsync(userId, TransactionType.Income,  monthBeforeStart, monthBeforeEnd);
         var spendingMonthBeforeTask = _transactionService.GetTotalByTypeAndPeriodAsync(userId, TransactionType.Expense, monthBeforeStart, monthBeforeEnd);
-
         var allTransactionsTask =  _transactionService.GetAllAsync(userId);
 
         await Task.WhenAll(
@@ -64,7 +61,6 @@ public class DashboardService : IDashboardService
         var totalBalance= totalBalanceTask.Result;
         var incomeRange= incomeRangeTask.Result;
         var spendingRange= spendingRangeTask.Result;
-
         var incomeThisMonth     = incomeThisMonthTask.Result;
         var spendingThisMonth   = spendingThisMonthTask.Result;
         var incomeLastMonth     = incomeLastMonthTask.Result;
@@ -78,16 +74,45 @@ public class DashboardService : IDashboardService
 
         var lastMonthBalance= totalBalance -incomeThisMonth + spendingThisMonth;
         var balanceChange=CalculatePercentageChange(lastMonthBalance,totalBalance);
-
         var incomeChange=CalculatePercentageChange(incomeMonthBefore,incomeLastMonth);
         var spendingChange= CalculatePercentageChange(spendingMonthBefore,spendingLastMonth);
+
+        var allSpending = BuildAllSpending(allTransactions);
+
+        var insightData = new SpendingInsightData
+        {
+            TotalIncomeThisMonth = incomeThisMonth,
+            TotalSpendingThisMonth = spendingThisMonth,
+            TotalIncomeLastMonth = incomeLastMonth,
+            TotalSpendingLastMonth= spendingLastMonth,
+            ThisMonthCategories = allSpending.ByRange
+            .GetValueOrDefault(TimeRange.Monthly)?.Categories
+            .Select(c=> new CategorySpending
+            {
+                Category=c.Label,
+                Amount = c.Amount,
+                Percentage = c.Percentage
+            }).ToList() ?? [],
+            LastMonthCategories=allTransactions
+            .Where(t=> t.Type == TransactionType.Expense && 
+            t.Date >= lastMonthStart && t.Date <= lastMonthStart)
+            .GroupBy(t=> t.Category)
+            .Select(g=> new CategorySpending
+            {
+                Category = g.Key,
+                Amount = g.Sum(x=> x.Amount),
+            }).ToList()
+        };
+
+        var insightText = await _insightService.GenerateInsightAsync(insightData);
 
         return new DashboardOverviewDto
         {
             SummaryCards=BuildSummaryCards(totalBalance,balanceChange,incomeRange,incomeChange,spendingRange,spendingChange,rangeLabel),
             BalanceOverviewChart = BuildBalanceOverviewChart(allTransactions,balanceRangeInMonths),
-            AllSpending = BuildAllSpending(allTransactions),
-            RecentTransactions = BuildRecentTransactions(allTransactions)
+            AllSpending = allSpending,
+            RecentTransactions = BuildRecentTransactions(allTransactions),
+            InsightText= insightText
         };        
     }
 

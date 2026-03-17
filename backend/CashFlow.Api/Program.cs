@@ -1,4 +1,5 @@
 using System.Text;
+using CashFlow.Api.Application.AI;
 using CashFlow.Api.Application.Interfaces;
 using CashFlow.Api.Application.Services;
 using CashFlow.Api.Infrastructure.Data;
@@ -32,7 +33,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<ICategorizationService, CategorizationService>();
+builder.Services.AddScoped<IInsightService, InsightService>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 
 //  JWT Authentication 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
