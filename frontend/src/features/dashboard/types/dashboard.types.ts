@@ -78,4 +78,5 @@ export interface DashboardOverview
     balanceOverviewChart:BalanceOverviewChart;
     allSpending:AllSpending;
     recentTransactions:Transaction[];
+    insightText :string;
 }

@@ -33,6 +33,7 @@ export type BalanceStatPoint = {
 export type BalanceStatistics={
     data:BalanceStatPoint[];
     activeMonth:string;
+    activeYear:number;
     activeAmount:number;
     changePercent:number;
     isPositive:boolean;    

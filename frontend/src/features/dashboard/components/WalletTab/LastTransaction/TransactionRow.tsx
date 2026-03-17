@@ -9,8 +9,6 @@ export function TransactionRow({transaction}:TransactionRowProps){
     const s= transactionRow({status:transaction.status});
     return(
         <div className={s.container()}>
-      
-      <div className={s.left()}>
        
         <div className={s.logoWrapper()}>
           {transaction.logo ? (
@@ -30,16 +28,16 @@ export function TransactionRow({transaction}:TransactionRowProps){
           <span className={s.company()}>{transaction.company}</span>
           <span className={s.category()}>{transaction.category}</span>
         </div>
-      </div>
+      
 
       <span className={s.type()}>{transaction.type}</span>
 
-      <div className={s.right()}>
+      
         <span className={s.amount()}>
           ${transaction.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
-        <span className={s.statusBadge()}>{transaction.status}</span>
-      </div>
+        <span className={s.statusBadge()}>{transaction.status.toUpperCase()}</span>
+    
     </div>
     )
 }

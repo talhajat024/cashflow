@@ -41,7 +41,7 @@ export default function WalletPage() {
         />
       </div>
 
-       <div className="grid grid-cols-2 gap-6 items-start">
+       <div className="grid grid-cols-2 gap-6">
         <BalanceStatistics statistics={selectedWallet.statistics} />
         <LastTransaction transactions={selectedWallet.lastTransaction} />
       </div>

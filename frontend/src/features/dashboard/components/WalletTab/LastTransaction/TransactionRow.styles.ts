@@ -1,26 +1,29 @@
-// features/dashboard/components/WalletTab/LastTransaction/TransactionRow.styles.ts
 import { tv } from "tailwind-variants";
 
 export const transactionRow = tv({
   slots: {
-    container:    "flex items-center justify-between py-3",
-    left:         "flex items-center gap-3",
-    logoWrapper:  "w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0",
-    logo:         "w-5 h-5 object-contain",
+    container:    "grid grid-cols-[auto_1fr_120px_100px_90px] items-center gap-4 py-1",
+
+    logoWrapper:  "w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0",
+    logo:         "w-6 h-6 object-contain",
     logoFallback: "text-[13px] font-bold text-gray-500",
-    info:         "flex flex-col",
+
+    info:         "flex flex-col min-w-0",
     company:      "text-[14px] font-medium text-gray-900",
     category:     "text-[12px] font-normal text-gray-400 mt-0.5",
-    type:         "text-[13px] font-normal text-gray-500",
-    right:        "flex flex-col items-end gap-1",
-    amount:       "text-[14px] font-semibold text-blue-500",
-    statusBadge:  "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium",
+
+    type:         "text-[13px] font-normal text-gray-400 whitespace-nowrap text-left",
+    amount:       "text-[14px] font-semibold text-blue-500 whitespace-nowrap text-left",
+    
+    statusBadge:  "inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap uppercase w-full text-center",
   },
   variants: {
     status: {
-      Success: { statusBadge: "bg-green-50 text-green-600"  },
-      Pending: { statusBadge: "bg-orange-50 text-orange-500" },
-      Failed:  { statusBadge: "bg-red-50 text-red-500"      },
+      Success:    { statusBadge: "bg-green-50 text-green-600"   },
+      Pending:    { statusBadge: "bg-orange-50 text-orange-500" },
+      Failed:     { statusBadge: "bg-red-50 text-red-500"       },
+      Incomplete: { statusBadge: "bg-gray-50 text-gray-500"     },
+      Completed:  { statusBadge: "bg-green-50 text-green-600"   },
     }
   }
 });

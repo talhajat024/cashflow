@@ -9,6 +9,7 @@ type BalanceStatisticsProps = {
 };
 
 export function BalanceStatistics({ statistics }: BalanceStatisticsProps) {
+  console.log("the data coming of statistics is:",statistics);
   return (
     <Card className="overflow-hidden flex flex-col">
       <CardHeader className={styles.header()}>
@@ -22,6 +23,7 @@ export function BalanceStatistics({ statistics }: BalanceStatisticsProps) {
         <BalanceChart
           data={statistics.data}
           activeMonth={statistics.activeMonth}
+          activeYear={statistics.activeYear}
           activeAmount={statistics.activeAmount}
           changePercent={statistics.changePercent}
           isPositive={statistics.isPositive}

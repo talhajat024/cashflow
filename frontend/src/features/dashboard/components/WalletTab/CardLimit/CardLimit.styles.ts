@@ -4,7 +4,7 @@ import { tv } from "tailwind-variants";
 export const cardLimit = tv({
   slots: {
     header:          "flex items-center justify-between",
-    title:           "text-[16px] font-semibold text-gray-400",
+    title:           "text-[16px] font-lighter text-gray-400",
 
     contentBox:      "flex flex-col justify-center py-2 px-2",
     
