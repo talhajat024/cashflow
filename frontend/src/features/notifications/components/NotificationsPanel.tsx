@@ -29,6 +29,7 @@ export const NotificationsPanel=({onClose}:NotificationsPanelProps)=>{
     }
 
     const handleMarkAllAsRead=async()=>{
+        console.log("notifications are:",notifications);
         await markAllAsRead();
     }
 

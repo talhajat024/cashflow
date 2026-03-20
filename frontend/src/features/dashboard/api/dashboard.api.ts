@@ -7,5 +7,6 @@ export async function getDashboardOverview(balanceRangeInMonths:number):Promise<
             balanceRangeInMonths,
         },
     });
+    console.log(response.data);
     return response.data;
 }

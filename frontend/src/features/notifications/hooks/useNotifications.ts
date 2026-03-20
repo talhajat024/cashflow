@@ -122,9 +122,36 @@ export const useNotifications= ()=>{
         catch(error)
         {
             console.error("Failed to mark all as read",error);
-    
         }
     },[])
+
+    const addInsightNotification = useCallback((insightText:string)=>{
+        if(!insightText) return;
+        setNotifications(prev=> {
+            const alreadyExists= prev.some(n=> n.id === 'insight-ai');
+            if(alreadyExists) return prev;
+
+            const insightNotification:Notification={
+                id:'insight-ai',
+                type:'alert',
+                title:'AI Financial Insight',
+                description:insightText,
+                timestamp:new Date(),
+                read:false,
+                actionable:false,
+            };
+            return [insightNotification, ...prev];
+        });
+
+        setNotifications(prev =>{
+            const exists= prev.find(n=> n.id === 'insight-ai');
+            if(exists && !exists.read)
+            {
+                setUnreadCount(count => count+1);
+            }
+            return prev;
+        });
+    },[]);
 
     return{
         notifications,
@@ -132,6 +159,7 @@ export const useNotifications= ()=>{
         unreadCount,
         markAllAsRead,
         markAsRead,
+        addInsightNotification,
     };
 }
 

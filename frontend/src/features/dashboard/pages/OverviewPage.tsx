@@ -1,4 +1,5 @@
 import { useOutletContext } from "react-router-dom";
+import { useEffect } from "react";
 import { PageState } from "../../../shared/ui/pagestate/PageState";
 import type { TimeRange,DashboardOverview } from "../types/dashboard.types";
 
@@ -6,6 +7,8 @@ import { OverviewStats } from "../components/OverviewStats";
 import { RecentTransactions } from "../components/RecentTransactions/RecentTransactions";
 import { DashboardInsights } from "../components/DashboardInsights/DashboardInsights";
 import { PageSkeleton } from "../../../shared/ui/pageskeleton";
+
+import { useNotifications } from "../../notifications/hooks/useNotifications";
 
 type DashboardContext = {
   data:DashboardOverview | null;
@@ -21,6 +24,14 @@ type DashboardContext = {
 
 export default function OverviewPage() {
   const { data, loading, error,balanceRange,onBalanceRangeChange,spendingRange,setSpendingRange } = useOutletContext<DashboardContext>();
+  const { addInsightNotification } = useNotifications();
+
+  useEffect(()=>{
+    if(data?.insightText)
+    {
+      addInsightNotification(data.insightText);
+    }
+  },[data?.insightText])
 
   if (error) {
     return <div>{error}</div>;
