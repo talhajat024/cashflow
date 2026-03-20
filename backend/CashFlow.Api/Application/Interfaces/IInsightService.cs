@@ -1,4 +1,4 @@
-using CashFlow.Api.Application.AI;
+using CashFlow.Api.Application;
 using CashFlow.Api.Application.DTOs.Spending;
 
 namespace CashFlow.Api.Application.Interfaces;

@@ -32,8 +32,6 @@
     <Folder Include="Application\DTOs\Auth\" />
     <Folder Include="Application\DTOs\Dashboard\" />
     <Folder Include="Application\DTOs\Wallets\" />
-    <Folder Include="Application\Interfaces\" />
-    <Folder Include="Application\Services\" />
     <Folder Include="Application\Transactions\" />
     <Folder Include="Application\Transactions\Commands\" />
     <Folder Include="Application\Transactions\Commands\CreateTransaction\" />

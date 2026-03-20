@@ -1,4 +1,3 @@
-using CashFlow.Api.Application.AI;
 using CashFlow.Api.Application.Common;
 using CashFlow.Api.Application.Interfaces;
 using CashFlow.Api.Domain.Entities;
@@ -12,13 +11,13 @@ public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand
 {
     private readonly ITransactionRepository _transactionRepo;
     private readonly IWalletRepository _walletRepo;
-    private readonly ICategorizationService _categorizationService;
+    private readonly ITransactionAIService _transactionAIService;
 
-    public CreateTransactionHandler(ITransactionRepository transactionRepo,IWalletRepository walletRepo,ICategorizationService categorizationService)
+    public CreateTransactionHandler(ITransactionRepository transactionRepo,IWalletRepository walletRepo,ITransactionAIService transactionAIService)
     {
         _transactionRepo=transactionRepo;
         _walletRepo= walletRepo;
-        _categorizationService= categorizationService;
+        _transactionAIService= transactionAIService;
     }
 
     public async Task<Result<CreateTransactionResponse>> Handle(CreateTransactionCommand command,CancellationToken cancellationToken)
@@ -33,20 +32,58 @@ public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand
 
         // Parse Enums
         if(!Enum.TryParse<TransactionType>(command.Type,out var type))
-            return Result<CreateTransactionResponse>.Failure("Invalid transaction nature");
+            return Result<CreateTransactionResponse>.Failure("Invalid transaction type");
 
         if(!Enum.TryParse<TransactionNature>(command.Nature,out var nature))
             return Result<CreateTransactionResponse>.Failure("Invalid transaction nature");
 
+        Console.WriteLine($"Description: {command.Description}");
+
+        var recentTransactions = await _transactionRepo.GetRecentAsync(command.UserId,30);
+
+        // Build anomaly detection data
+        var anomalyData= new AnomalyDetectionData
+        {
+            MerchantName         = command.CounterpartyName,
+        Amount               = command.Amount,
+        Type                 = command.Type,
+        Nature               = command.Nature,
+        TotalTransactions    = recentTransactions.Count,
+        AverageAmount        = recentTransactions.Any()
+            ? recentTransactions.Average(t => t.Amount) : 0,
+        MaxAmount            = recentTransactions.Any()
+            ? recentTransactions.Max(t => t.Amount) : 0,
+        AverageAmountForType = recentTransactions
+            .Where(t => t.Type.ToString() == command.Type)
+            .Any()
+                ? recentTransactions
+                    .Where(t => t.Type.ToString() == command.Type)
+                    .Average(t => t.Amount)
+                : 0,
+        MerchantSeenBefore   = recentTransactions
+            .Any(t => t.CounterpartyName
+                .Equals(command.CounterpartyName, StringComparison.OrdinalIgnoreCase)),
+        };
+
          // Ai Categorization
          // Runs silently - returns others if fail
-         var category= await _categorizationService.CategorizeAsync(command.CounterpartyName,command.Amount);
+         var categoryTask=  _transactionAIService.CategorizeAsync(command.CounterpartyName,command.Amount);
+         var descriptionTask= string.IsNullOrWhiteSpace(command.Description) ? _transactionAIService.GenerateDescriptionAsync(command.CounterpartyName,command.Amount,command.Type,command.Nature) : Task.FromResult(command.Description);
+        var anomalyTask = _transactionAIService.DetectAnomalyAsync(anomalyData);
 
-         Console.WriteLine($" AI Category: {command.CounterpartyName} → {category}");
+         await Task.WhenAll(categoryTask,descriptionTask,anomalyTask);
+
+         var category = categoryTask.Result;
+         var description = descriptionTask.Result; 
+         var anomaly= anomalyTask.Result;
+
+        Console.WriteLine($" AI Category: {command.CounterpartyName} → {category}");
+        Console.WriteLine($" AI Description: {command.CounterpartyName} → {description}");
+        Console.WriteLine($" AI Anomaly:     {command.CounterpartyName} → {anomaly.IsAnomaly} {anomaly.Reason}");
 
          var transaction = new Transaction
          {
-             Id               = Guid.NewGuid(),
+            Id               = Guid.NewGuid(),
             UserId           = command.UserId,
             WalletId         = command.WalletId,
             ToWalletId       = command.ToWalletId,
@@ -57,7 +94,7 @@ public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand
             CounterpartyName = command.CounterpartyName,
             CounterpartyLogo = command.CounterpartyLogo,
             Category         = category,              
-            Description      = command.Description,
+            Description      = description,
             Date             = command.Date ?? DateTime.UtcNow,
             CreatedAt        = DateTime.UtcNow,
          };
@@ -87,6 +124,9 @@ public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand
             Status           = transaction.Status.ToString(),
             Date             = transaction.Date,
             CreatedAt        = transaction.CreatedAt,
+            Description= transaction.Description,
+            IsAnomaly        = anomaly.IsAnomaly,       
+            AnomalyReason    = anomaly.Reason,     
         });
     }
 }
