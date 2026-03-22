@@ -1,0 +1,175 @@
+using CashFlow.Api.Application.Interfaces;
+using iText.Kernel.Colors;
+using iText.Kernel.Font;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using iText.Kernel.Pdf.Canvas.Draw;
+using iText.Layout.Borders;
+using iText.Layout;
+using iText.Layout.Properties;
+using iText.IO.Font.Constants;
+
+namespace CashFlow.Api.Infrastructure.PDF;
+
+public class PdfGenerator
+{
+    public byte[] Generate(MonthlyReportData data)
+    {
+        using var stream = new MemoryStream();
+        var writer = new PdfWriter(stream);
+        var pdf= new PdfDocument(writer);
+        var document = new Document(pdf);
+
+        // Fonts
+        var boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+        var regularFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+        var blueColor = new DeviceRgb(59,130,246);
+        var grayColor= new DeviceRgb(107,114,128);
+        var darkColor = new DeviceRgb(17,24,39);
+
+        // Header
+        document.Add(new Paragraph("CASHFLOW").SetFont(boldFont)
+        .SetFontSize(28)
+        .SetFontColor(blueColor)
+        .SetTextAlignment(TextAlignment.CENTER));
+
+        document.Add(new Paragraph("Monthly Financial Report")
+        .SetFont(regularFont)
+        .SetFontSize(14)
+        .SetFontColor(grayColor)
+        .SetTextAlignment(TextAlignment.CENTER));
+
+        document.Add(new Paragraph($"{data.MonthName} {data.Year}")
+        .SetFont(boldFont)
+        .SetFontSize(16)
+        .SetFontColor(darkColor)
+        .SetTextAlignment(TextAlignment.CENTER)
+        .SetMarginBottom(20));
+
+        // Divider
+        document.Add(new LineSeparator(new SolidLine(1f))
+    .SetMarginBottom(15));
+        
+        // Summary Section
+        document.Add(new Paragraph("FINANCIAL SUMMARY")
+        .SetFont(boldFont)
+        .SetFontSize(12)
+        .SetFontColor(blueColor)
+        .SetMarginBottom(8));
+
+        AddSummaryRow(document,boldFont,regularFont,"Total Income",$"${data.TotalIncome:F2}", new DeviceRgb(16, 185, 129));
+        AddSummaryRow(document,boldFont,regularFont,"Total Spending",$"${data.TotalSpending:F2}", new DeviceRgb(239, 68, 68));
+        AddSummaryRow(document, boldFont, regularFont, "Net Savings",$"${data.NetSavings:F2}", blueColor);
+        AddSummaryRow(document, boldFont, regularFont, "Savings Rate",$"{data.SavingsRate:F1}%", blueColor);
+        AddSummaryRow(document, boldFont, regularFont, "Opening Balance",$"${data.OpeningBalance:F2}", grayColor);
+        AddSummaryRow(document, boldFont, regularFont, "Closing Balance",$"${data.ClosingBalance:F2}", darkColor);
+        document.Add(new Paragraph("\n"));
+
+        // Ai Insights
+        document.Add(new Paragraph("AI INSIGHTS")
+        .SetFont(boldFont)
+        .SetFontSize(12)
+        .SetFontColor(blueColor)
+        .SetMarginBottom(8));
+
+        document.Add(new Paragraph(data.Narrative)
+        .SetFont(regularFont)
+        .SetFontSize(11)
+        .SetFontColor(darkColor)
+        .SetMarginBottom(20)
+        .SetBackgroundColor(new DeviceRgb(239,246,255))
+        .SetPadding(12)
+        .SetBorderRadius(new iText.Layout.Properties.BorderRadius(6)));
+
+        // Spending By Category
+        document.Add(new Paragraph("SPENDING BY CATEGORY")
+        .SetFont(boldFont)
+        .SetFontSize(12)
+        .SetFontColor(blueColor)
+        .SetMarginBottom(8));
+
+        foreach(var category in data.Categories)
+        {
+            AddSummaryRow(document,boldFont,regularFont,$"{category.Category} ({category.Percentage:F1}%)",
+                $"${category.Amount:F2}", darkColor);
+        }
+
+        document.Add(new Paragraph("\n"));
+
+        // Top Transactions
+        document.Add(new Paragraph("TOP TRANSACTIONS")
+        .SetFont(boldFont)
+        .SetFontSize(12)
+        .SetFontColor(blueColor)
+        .SetMarginBottom(8));
+
+        // Table header
+        var table = new Table(new float[] {3,2,2,1})
+        .UseAllAvailableWidth()
+        .SetMarginBottom(20);
+
+        table.AddHeaderCell(HeaderCell("Company",boldFont,blueColor));
+        table.AddHeaderCell(HeaderCell("Category",boldFont,blueColor));
+        table.AddHeaderCell(HeaderCell("Amount",boldFont,blueColor));
+        table.AddHeaderCell(HeaderCell("Type",boldFont,blueColor));
+
+        foreach(var tx in data.TopTransactions)
+        {
+          table.AddCell(new Cell().Add(new Paragraph(tx.Company)
+                .SetFont(regularFont).SetFontSize(10)));
+            table.AddCell(new Cell().Add(new Paragraph(tx.Category)
+                .SetFont(regularFont).SetFontSize(10)));
+            table.AddCell(new Cell().Add(new Paragraph($"${tx.Amount:F2}")
+                .SetFont(boldFont).SetFontSize(10).SetFontColor(blueColor)));
+            table.AddCell(new Cell().Add(new Paragraph(tx.Type)
+                .SetFont(regularFont).SetFontSize(10).SetFontColor(grayColor))); 
+        }
+        document.Add(table);
+
+        // Footer
+        document.Add(new Paragraph($"Generated by CashFlow AI • {DateTime.UtcNow:dd MMM yyyy}")
+            .SetFont(regularFont)
+            .SetFontSize(9)
+            .SetFontColor(grayColor)
+            .SetTextAlignment(TextAlignment.CENTER));
+
+        document.Close();
+        return stream.ToArray();
+    }
+
+    private static void AddSummaryRow(
+    Document doc,
+    PdfFont boldFont,
+    PdfFont regularFont,
+    string label,
+    string value,
+    Color valueColor)
+{
+    var table = new Table(new float[] { 3, 2 })
+        .UseAllAvailableWidth()
+        .SetBorder(Border.NO_BORDER);
+
+    table.AddCell(new Cell()
+        .Add(new Paragraph(label)
+            .SetFont(regularFont)
+            .SetFontSize(11))
+        .SetBorder(Border.NO_BORDER));
+
+    table.AddCell(new Cell()
+        .Add(new Paragraph(value)
+            .SetFont(boldFont)
+            .SetFontSize(11)
+            .SetFontColor(valueColor)
+            .SetTextAlignment(TextAlignment.RIGHT))
+        .SetBorder(Border.NO_BORDER));
+
+    doc.Add(table);
+}
+
+    private static Cell HeaderCell(string text, PdfFont font, Color color) =>
+        new Cell().Add(new Paragraph(text)
+            .SetFont(font)
+            .SetFontSize(10)
+            .SetFontColor(color))
+            .SetBackgroundColor(new DeviceRgb(239, 246, 255));
+}

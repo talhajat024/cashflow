@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Anthropic.SDK" Version="5.10.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="itext7" Version="9.5.0" />
+    <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.5.0" />
     <PackageReference Include="MailKit" Version="4.3.0" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
@@ -28,10 +30,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Application\Budget\" />
+    <Folder Include="Application\Budget\Queries\" />
+    <Folder Include="Application\Budget\Queries\GetBudgetRecommendations\" />
     <Folder Include="Application\Common\" />
+    <Folder Include="Application\Dashboard\" />
+    <Folder Include="Application\Dashboard\Queries\" />
+    <Folder Include="Application\Dashboard\Queries\GetHealthScore\" />
     <Folder Include="Application\DTOs\Auth\" />
     <Folder Include="Application\DTOs\Dashboard\" />
     <Folder Include="Application\DTOs\Wallets\" />
+    <Folder Include="Application\Reports\" />
+    <Folder Include="Application\Reports\Queries\" />
+    <Folder Include="Application\Reports\Queries\GetMonthlyReport\" />
     <Folder Include="Application\Transactions\" />
     <Folder Include="Application\Transactions\Commands\" />
     <Folder Include="Application\Transactions\Commands\CreateTransaction\" />
@@ -45,6 +56,7 @@
     <Folder Include="Domain\Enums\" />
     <Folder Include="Infrastructure\" />
     <Folder Include="Infrastructure\Data\" />
+    <Folder Include="Infrastructure\PDF\" />
     <Folder Include="Infrastructure\Repositories\" />
   </ItemGroup>
 

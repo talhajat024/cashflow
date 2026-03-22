@@ -3,6 +3,7 @@ using CashFlow.Api.Application;
 using CashFlow.Api.Application.Interfaces;
 using CashFlow.Api.Application.Services;
 using CashFlow.Api.Infrastructure.Data;
+using CashFlow.Api.Infrastructure.PDF;
 using CashFlow.Api.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -35,8 +36,13 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<ITransactionAIService, TransactionAIService>();
 builder.Services.AddScoped<IInsightService, InsightService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IHealthScoreService, HealthScoreService>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
+
+builder.Services.AddScoped<PdfGenerator>(); 
 
 //  JWT Authentication 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

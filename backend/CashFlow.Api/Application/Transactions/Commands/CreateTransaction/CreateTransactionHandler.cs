@@ -115,7 +115,7 @@ public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand
         return Result<CreateTransactionResponse>.Success(new CreateTransactionResponse
         {
             Id = transaction.Id,
-             WalletId        = transaction.WalletId,
+            WalletId        = transaction.WalletId,
             Amount           = transaction.Amount,
             Type             = transaction.Type.ToString(),
             Nature           = transaction.Nature.ToString(),
