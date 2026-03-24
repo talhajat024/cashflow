@@ -3,13 +3,18 @@ import { useReport } from "../hooks/useReport";
 import { HealthScoreCard } from "../components/HealthScoreCard";
 import { BudgetRecommendations } from "../components/BudgetRecommendations";
 import { MonthlyReport } from "../components/MonthlyReport";
+import { ReportStatsRow } from "../components/ReportStatsRow/ReportStatsRow";
+import { IncomeVsExpenseChart } from "../components/IncomeVsExpenseChart/IncomeVsExpenseChart";
+import { TransactionStatsPanel } from "../components/TransactionStatsPanel/TransactionStatsPanel";
 import { PageSkeleton } from "../../../shared/ui/pageskeleton";
 
-export default function ReportPage()
-{
+export default function ReportPage() {
   const {
     healthScore,
     budgetRecommendations,
+    reportStats,
+    incomeVsExpense,
+    transactionStats,
     loading,
     error,
     selectedMonth,
@@ -18,36 +23,31 @@ export default function ReportPage()
     setSelectedYear,
     downloading,
     downloadReport,
-  }=useReport();
+  } = useReport();
 
-  if(loading) return <PageSkeleton layout="dashboard"/>
-  if(error)
-  {
-    return(
+  if (loading) return <PageSkeleton layout="dashboard" />;
+  if (error) {
+    return (
       <div className="flex items-center justify-center h-40 text-red-500 text-sm">
         {error}
       </div>
     );
   }
 
-  return(
+  return (
     <div className="flex flex-col gap-6 pb-10">
 
-      {/*  Page Header  */}
+      {/* Page Header */}
       <div className="flex items-center gap-3">
-        <h2 className="text-[20px] font-semibold text-gray-900">
-          Financial Report
-        </h2>
+        <h2 className="text-[20px] font-semibold text-gray-900">Financial Report</h2>
         <span className="flex items-center gap-1.5 text-[12px] font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
           <Sparkles size={12} />
           AI Powered
         </span>
       </div>
 
-      {/*  Row 1: Health Score + Monthly Report  */}
+      {/* Row 1: Health Score + Monthly Report Download */}
       <div className="grid grid-cols-2 gap-6 items-start">
-
-        {/* Health Score */}
         {healthScore ? (
           <HealthScoreCard data={healthScore} />
         ) : (
@@ -56,7 +56,6 @@ export default function ReportPage()
           </div>
         )}
 
-        {/* Monthly Report Download */}
         <MonthlyReport
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
@@ -65,10 +64,24 @@ export default function ReportPage()
           onDownload={downloadReport}
           downloading={downloading}
         />
-
       </div>
 
-      {/*  Row 2: Budget Recommendations  */}
+      {/* Row 2: Total Income + Total Spending stat cards */}
+      {reportStats && (
+        <ReportStatsRow stats={reportStats} chartData={incomeVsExpense} />
+      )}
+
+      {/* Row 3: Income vs Expense bar chart */}
+      {incomeVsExpense.length > 0 && (
+        <IncomeVsExpenseChart data={incomeVsExpense} />
+      )}
+
+      {/* Row 4: Transaction Stats donut + Top Merchants */}
+      {transactionStats && (
+        <TransactionStatsPanel data={transactionStats} />
+      )}
+
+      {/* Row 5: AI Budget Recommendations */}
       {budgetRecommendations ? (
         <BudgetRecommendations data={budgetRecommendations} />
       ) : (
@@ -78,5 +91,5 @@ export default function ReportPage()
       )}
 
     </div>
-  )
+  );
 }
