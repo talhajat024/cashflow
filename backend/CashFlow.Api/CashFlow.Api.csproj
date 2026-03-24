@@ -26,6 +26,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Mscc.GenerativeAI" Version="3.1.0" />
+    <PackageReference Include="OpenAI" Version="2.9.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
@@ -42,7 +43,10 @@
     <Folder Include="Application\DTOs\Wallets\" />
     <Folder Include="Application\Reports\" />
     <Folder Include="Application\Reports\Queries\" />
+    <Folder Include="Application\Reports\Queries\GetIncomeVsExpense\" />
     <Folder Include="Application\Reports\Queries\GetMonthlyReport\" />
+    <Folder Include="Application\Reports\Queries\GetReportStats\" />
+    <Folder Include="Application\Reports\Queries\GetTransactionStats\" />
     <Folder Include="Application\Transactions\" />
     <Folder Include="Application\Transactions\Commands\" />
     <Folder Include="Application\Transactions\Commands\CreateTransaction\" />
