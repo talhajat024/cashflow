@@ -1,10 +1,11 @@
+using System.Diagnostics;
 using CashFlow.Api.Application.Common;
 using CashFlow.Api.Application.Interfaces;
 using CashFlow.Api.Domain.Enums;
 using CashFlow.Api.Infrastructure.Repositories;
 using MediatR;
 
-namespace CashFlow.Api.Application.Dashboard.Queries.GetHealthScore;
+namespace CashFlow.Api.Application.Reports.Queries.GetHealthScore;
 
 public class GetHealthScoreHandler:IRequestHandler<GetHealthScoreQuery,Result<GetHealthScoreResponse>>
 {
@@ -21,9 +22,10 @@ public class GetHealthScoreHandler:IRequestHandler<GetHealthScoreQuery,Result<Ge
 
     public async Task<Result<GetHealthScoreResponse>> Handle(GetHealthScoreQuery query,CancellationToken cancellationToken)
     {
-        var now = DateTime.UtcNow;
+        var total = Stopwatch.StartNew();
+        var sw= Stopwatch.StartNew();
 
-        // Date Ranges 
+        var now = DateTime.UtcNow;
         var thisMonthStart = new DateTime(now.Year,now.Month,1);
         var lastMonthStart = thisMonthStart.AddMonths(-1);
         var twoMonthsStart = thisMonthStart.AddMonths(-2);
@@ -33,10 +35,15 @@ public class GetHealthScoreHandler:IRequestHandler<GetHealthScoreQuery,Result<Ge
         var allTransactions = await _transactionRepo.GetByUserAsync(query.UserId);
         var wallets = await _walletRepo.GetByUserIdAsync(query.UserId);
 
+        Console.WriteLine($"[PERF] HealthScore | DB fetch: {sw.ElapsedMilliseconds}ms");
+        sw.Restart();
+
         if(!allTransactions.Any())
         {
             return Result<GetHealthScoreResponse>.NotFound("No transaction data found to calculate health score");
         }
+
+        // Business Logic
 
         var threeMonthTx = allTransactions.Where(t=> t.Date >= threeMonthsStart)
         .ToList();
@@ -93,6 +100,9 @@ public class GetHealthScoreHandler:IRequestHandler<GetHealthScoreQuery,Result<Ge
             .Select(g => g.Key)
             .ToList();
 
+        Console.WriteLine($"[PERF] HealthScore | Business Logic: {sw.ElapsedMilliseconds}ms");
+        sw.Restart();
+
         //  Build Health Score Data 
         var healthData = new HealthScoreData
         {
@@ -112,6 +122,8 @@ public class GetHealthScoreHandler:IRequestHandler<GetHealthScoreQuery,Result<Ge
 
         //  Call AI 
         var result = await _healthScoreService.GenerateHealthScoreAsync(healthData);
+        Console.WriteLine($"[PERF] HealthScore | TOTAL:  {total.ElapsedMilliseconds}ms");
+
 
         return Result<GetHealthScoreResponse>.Success(new GetHealthScoreResponse
         {

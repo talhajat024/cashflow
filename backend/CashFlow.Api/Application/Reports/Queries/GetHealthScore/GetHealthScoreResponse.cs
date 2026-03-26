@@ -1,4 +1,4 @@
-namespace CashFlow.Api.Application.Dashboard.Queries.GetHealthScore;
+namespace CashFlow.Api.Application.Reports.Queries.GetHealthScore;
 
 public class GetHealthScoreResponse
 {

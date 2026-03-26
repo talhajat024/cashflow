@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CashFlow.Api.Application.DTOs;
 using CashFlow.Api.Application.Interfaces;
-using CashFlow.Api.Application.Dashboard.Queries.GetHealthScore;
+using CashFlow.Api.Application.Reports.Queries.GetHealthScore;
 using MediatR;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
