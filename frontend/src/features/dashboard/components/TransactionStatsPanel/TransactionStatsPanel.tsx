@@ -9,9 +9,12 @@ interface Props {
 const COLORS = ["#f97316", "#3b82f6", "#10b981", "#eab308", "#8b5cf6", "#ec4899"];
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(n);
 
-// Fallback icon initials when no logo
 function MerchantAvatar({ name, color }: { name: string; color: string }) {
   return (
     <div
@@ -25,9 +28,9 @@ function MerchantAvatar({ name, color }: { name: string; color: string }) {
 
 export function TransactionStatsPanel({ data }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="flex flex-col gap-6">
 
-      {/* Donut chart */}
+      {/* Transaction Statistics — Donut */}
       <div className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -39,8 +42,9 @@ export function TransactionStatsPanel({ data }: Props) {
           </button>
         </div>
 
-        <div className="flex justify-center mb-4">
-          <div className="h-44 w-44">
+        {/* Donut */}
+        <div className="flex justify-center my-2">
+          <div className="h-40 w-40">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -49,8 +53,8 @@ export function TransactionStatsPanel({ data }: Props) {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={52}
-                  outerRadius={80}
+                  innerRadius={46}
+                  outerRadius={72}
                   paddingAngle={2}
                 >
                   {data.categories.map((_, i) => (
@@ -59,14 +63,20 @@ export function TransactionStatsPanel({ data }: Props) {
                 </Pie>
                 <Tooltip
                   formatter={(v: number | undefined) => [fmt(v ?? 0)]}
-                  contentStyle={{ borderRadius: 10, fontSize: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
+                  contentStyle={{
+                    borderRadius: 10,
+                    fontSize: 12,
+                    border: "none",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="space-y-2">
+        {/* Legend */}
+        <div className="space-y-2 mt-2">
           {data.categories.map((cat, i) => (
             <div key={cat.name} className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
@@ -103,12 +113,10 @@ export function TransactionStatsPanel({ data }: Props) {
               ) : (
                 <MerchantAvatar name={merchant.name} color={COLORS[i % COLORS.length]} />
               )}
-
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{merchant.name}</p>
                 <p className="text-xs text-gray-400">{merchant.category}</p>
               </div>
-
               <div className="text-right flex-shrink-0">
                 <p className="text-sm font-semibold text-gray-900">{fmt(merchant.totalAmount)}</p>
                 <p className="text-xs text-gray-400">{merchant.transactions} transactions</p>

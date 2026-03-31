@@ -12,6 +12,12 @@ const fmt = (n: number) =>
   n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n}`;
 
 export function IncomeVsExpenseChart({ data }: Props) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] h-72" />
+    );
+  }
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
       <div className="flex items-center justify-between mb-1">
@@ -31,8 +37,8 @@ export function IncomeVsExpenseChart({ data }: Props) {
         </div>
       </div>
 
-      <div className="h-64 mt-4">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-64 mt-4 min-h-[256px]">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart data={data} barCategoryGap="30%" barGap={3}>
             <CartesianGrid vertical={false} stroke="#f0f0f0" />
             <XAxis
