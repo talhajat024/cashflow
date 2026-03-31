@@ -25,6 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.5" />
     <PackageReference Include="Mscc.GenerativeAI" Version="3.1.0" />
     <PackageReference Include="OpenAI" Version="2.9.1" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.15.0" />
@@ -32,6 +33,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.15.0-beta.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.12.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
@@ -64,6 +66,7 @@
     <Folder Include="Domain\Entities\" />
     <Folder Include="Domain\Enums\" />
     <Folder Include="Infrastructure\" />
+    <Folder Include="Infrastructure\AI\" />
     <Folder Include="Infrastructure\Data\" />
     <Folder Include="Infrastructure\PDF\" />
     <Folder Include="Infrastructure\Repositories\" />

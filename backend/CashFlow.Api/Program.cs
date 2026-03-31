@@ -2,6 +2,7 @@ using System.Text;
 using CashFlow.Api.Application;
 using CashFlow.Api.Application.Interfaces;
 using CashFlow.Api.Application.Services;
+using CashFlow.Api.Infrastructure.AI;
 using CashFlow.Api.Infrastructure.Data;
 using CashFlow.Api.Infrastructure.PDF;
 using CashFlow.Api.Infrastructure.Repositories;
@@ -29,6 +30,8 @@ builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 //  Services 
+
+builder.Services.AddSingleton<IGeminiClientFactory, GeminiClientFactory>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -48,6 +51,11 @@ builder.Services.AddOpenTelemetry()
         .AddEntityFrameworkCoreInstrumentation() 
         .AddConsoleExporter()              
     );
+builder.Services.AddStackExchangeRedisCache(options=>
+{
+    options.Configuration= builder.Configuration["Redis:ConnectionString"];
+    options.InstanceName = "CashFlow"; // prefix for all keys
+});
 
 builder.Services.AddScoped<PdfGenerator>(); 
 

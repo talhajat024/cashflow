@@ -1,31 +1,44 @@
 using CashFlow.Api.Application.Interfaces;
-using Mscc.GenerativeAI;
-using Microsoft.Extensions.Configuration;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace CashFlow.Api.Application.Services;
 
 public class HealthScoreService:IHealthScoreService
 {
-    private readonly string _apiKey;
-    public HealthScoreService(IConfiguration configuration)
+    private readonly IGeminiClientFactory _gemini;
+    private readonly IDistributedCache _cache;
+    public HealthScoreService(IGeminiClientFactory gemini,IDistributedCache cache)
     {
-        _apiKey=configuration["Gemini:ApiKey"] ?? throw new InvalidOperationException("Gemini API key not configured");
+        _gemini=gemini;
+        _cache= cache;
     }
 
     public async Task<HealthScoreResult> GenerateHealthScoreAsync(HealthScoreData data)
     {
+        var cacheKey= $"healthscore:{data.AvgMonthlyIncome:F0}:{data.AvgMonthlySpending:F0}:" +
+                       $"{data.AvgSavingsRate:F1}:{data.CurrentBalance:F0}:{data.TotalTransactions}";
+        var cached= await _cache.GetStringAsync(cacheKey);
+        if(cached is not null)
+        {
+            Console.WriteLine("CACHE HIT HealthScore at {DateTime.UtcNow:HH:mm:ss}");
+            return JsonSerializer.Deserialize<HealthScoreResult>(cached)!;
+        }
+
+        Console.WriteLine($" CACHE MISS HealthScore at {DateTime.UtcNow:HH:mm:ss}");
         try
         {
-            var googleAI= new GoogleAI(_apiKey);
-            var model = googleAI.GenerativeModel("gemini-2.5-flash");
-
+            var model = _gemini.CreateModel();
             var prompt= BuildPrompt(data);
             var response = await model.GenerateContent(prompt);
             var text= response.Text?.Trim() ?? string.Empty;
 
-            Console.WriteLine($"AI Health Score Response: {text}");
-            return ParseResponse(text,data);
+            var result = ParseResponse(text,data);
+            await _cache.SetStringAsync(cacheKey,JsonSerializer.Serialize(result), new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
+            });
+            return result;
         }
         catch(Exception ex)
         {
@@ -36,53 +49,17 @@ public class HealthScoreService:IHealthScoreService
 
     private static string BuildPrompt(HealthScoreData data)
     {
-        var topCategories = string.Join(", ", data.TopCategories);
-    
-        return $$"""
-            You are a financial health analyst. Score this user's financial health.
-    
-            Financial Data (last 3 months):
-            - Average monthly income:       {{data.AvgMonthlyIncome:F2}}
-            - Average monthly spending:     {{data.AvgMonthlySpending:F2}}
-            - Average savings rate:         {{data.AvgSavingsRate:F1}}%
-            - Current balance:              {{data.CurrentBalance:F2}}
-            - Balance growth vs last month: {{data.BalanceGrowth:F2}}
-            - Income this month:            {{data.IncomeThisMonth:F2}}
-            - Income last month:            {{data.IncomeLastMonth:F2}}
-            - Income two months ago:        {{data.IncomeTwoMonthsAgo:F2}}
-            - Spending this month:          {{data.SpendingThisMonth:F2}}
-            - Spending last month:          {{data.SpendingLastMonth:F2}}
-            - Top spending categories:      {{topCategories}}
-            - Total transactions:           {{data.TotalTransactions}}
-    
-            Return ONLY valid JSON in this exact format:
-            {
-              "score": 72,
-              "grade": "B",
-              "summary": "Good financial health with room to improve",
-              "strengths": ["Consistent income", "Positive savings rate"],
-              "improvements": ["Reduce food spending", "Build emergency fund"],
-              "breakdown": {
-                "savingsRate": 85,
-                "incomeStability": 90,
-                "spendingControl": 60,
-                "balanceGrowth": 75
-              }
-            }
-    
-            Scoring Rules:
-            - score: 0-100 overall financial health
-            - grade: A(90-100), B(75-89), C(60-74), D(45-59), F(below 45)
-            - strengths: 2-3 positive aspects max 8 words each
-            - improvements: 2-3 actionable tips max 8 words each
-            - breakdown scores: each 0-100
-              savingsRate:     based on savings rate (20% or more = high score)
-              incomeStability: based on income consistency across 3 months
-              spendingControl: based on spending vs income ratio
-              balanceGrowth:   based on balance trend
-            - summary: max 10 words
-            - Return valid JSON only — no markdown no backticks
-            """;
+        var categories = string.Join(",", data.TopCategories);
+
+        return $"Income:{data.AvgMonthlyIncome:F0}/mo,Spend:{data.AvgMonthlySpending:F0}/mo," +
+               $"Savings:{data.AvgSavingsRate:F1}%,Balance:{data.CurrentBalance:F0}," +
+               $"Growth:{data.BalanceGrowth:F0},IncomeMonths:{data.IncomeThisMonth:F0}/{data.IncomeLastMonth:F0}/{data.IncomeTwoMonthsAgo:F0}," +
+               $"SpendMonths:{data.SpendingThisMonth:F0}/{data.SpendingLastMonth:F0}," +
+               $"Transactions:{data.TotalTransactions},TopCategories:{categories}.\n" +
+               "JSON only:{\"score\":0,\"grade\":\"\",\"summary\":\"\",\"strengths\":[],\"improvements\":[]," +
+               "\"breakdown\":{\"savingsRate\":0,\"incomeStability\":0,\"spendingControl\":0,\"balanceGrowth\":0}}\n" +
+               "Rules: score=0-100. grade=A(90+)/B(75-89)/C(60-74)/D(45-59)/F(<45). " +
+               "2-3 strengths/improvements≤8words each. summary≤10words. No markdown.";
     }
     private static HealthScoreResult ParseResponse(string text, HealthScoreData data)
     {

@@ -2,32 +2,45 @@ using CashFlow.Api.Application.Interfaces;
 using Mscc.GenerativeAI;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace CashFlow.Api.Application.Services;
 
 public class BudgetService:IBudgetService
 {
-    private readonly string _apiKey;
-    public BudgetService(IConfiguration configuration)
+    private readonly IGeminiClientFactory _gemini;
+    private readonly IDistributedCache _cache;
+    public BudgetService(IGeminiClientFactory gemini,IDistributedCache cache)
     {
-        _apiKey=configuration["Gemini:ApiKey"]
-            ?? throw new InvalidOperationException("Gemini API key not configured");
+        _gemini=gemini;
+        _cache=cache;
     }
 
     public async Task<BudgetRecommendationResult> GenerateRecommendationsAsync(List<CategorySpendingData> spendingData,decimal totalMonthlyIncome)
     {
+        var cacheKey = $"budget:{totalMonthlyIncome:F0}:{string.Join(",", spendingData.Select(s => $"{s.Category}:{s.MonthlyAvg:F0}"))}";
+        // Check
+        var cached= await _cache.GetStringAsync(cacheKey);
+        if(cached is not null)
+        {
+            Console.WriteLine($" CACHE HIT at {DateTime.UtcNow:HH:mm:ss.fff}");
+            return JsonSerializer.Deserialize<BudgetRecommendationResult>(cached)!;
+        }
+        Console.WriteLine($"CACHE MISS at {DateTime.UtcNow:HH:mm:ss.fff}");
         try
         {
-            var googleAI= new GoogleAI(_apiKey);
-            var model = googleAI.GenerativeModel("gemini-2.5-flash");
-
+            Console.WriteLine($" Gemini API CALLED at {DateTime.UtcNow:HH:mm:ss.fff}");
+            var model = _gemini.CreateModel();
             var prompt = BuildPrompt(spendingData,totalMonthlyIncome);
             var response = await model.GenerateContent(prompt);
             var text= response.Text?.Trim() ?? string.Empty;
+            var result = ParseResponse(text,spendingData);
             
-            Console.WriteLine($"AI Budget Response: {text}");
-
-            return ParseResponse(text, spendingData);
+            await _cache.SetStringAsync(cacheKey,JsonSerializer.Serialize(result),new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow=TimeSpan.FromHours(2)
+            });
+            return result;
         }
         catch(Exception ex)
         {
@@ -36,38 +49,16 @@ public class BudgetService:IBudgetService
         }
     }
 
-    private static string BuildPrompt(
-        List<CategorySpendingData> spendingData,
-        decimal totalMonthlyIncome)
+    private static string BuildPrompt(List<CategorySpendingData> spendingData, decimal totalMonthlyIncome)
     {
-        var categoryLines = string.Join("\n", spendingData.Select(c =>
-            $"- {c.Category}: avg ${c.MonthlyAvg:F0}/month " +
-            $"(last month: ${c.LastMonth:F0}, two months ago: ${c.TwoMonthsAgo:F0})"));
+        var lines = string.Join(",", spendingData.Select(c =>
+            $"{c.Category}:avg${c.MonthlyAvg:F0}/last${c.LastMonth:F0}"));
 
-        // Use regular string concatenation to avoid raw string interpolation issues
-        return
-            "You are a personal finance advisor. Generate budget recommendations.\n\n" +
-            $"User's monthly income: ${totalMonthlyIncome:F0}\n\n" +
-            "Current spending by category (last 3 months average):\n" +
-            categoryLines + "\n\n" +
-            "Return ONLY a JSON object in this exact format, no explanation:\n" +
-            "{\n" +
-            "  \"categories\": [\n" +
-            "    {\n" +
-            "      \"category\": \"Food\",\n" +
-            "      \"suggestedBudget\": 650,\n" +
-            "      \"reasoning\": \"Reduce by 150 to improve savings\",\n" +
-            "      \"priority\": \"High\"\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"overallInsight\": \"You could save 200 per month with these adjustments\"\n" +
-            "}\n\n" +
-            "Rules:\n" +
-            "- priority must be: High, Medium, or Low\n" +
-            "- suggestedBudget should be realistic (5-20% reduction max)\n" +
-            "- reasoning max 8 words\n" +
-            "- overallInsight max 12 words\n" +
-            "- Return valid JSON only — no markdown, no backticks";
+        return $"Finance advisor. Income:${totalMonthlyIncome:F0}. Spending:{lines}.\n" +
+               "Reply ONLY JSON: {\"categories\":[{\"category\":\"\",\"suggestedBudget\":0," +
+               "\"reasoning\":\"\",\"priority\":\"High|Medium|Low\"}]," +
+               "\"overallInsight\":\"\"}\n" +
+               "Max 5-20% reduction. Reasoning 8 words. Insight 12 words. No markdown.";
     }
 
     // Parse AI response

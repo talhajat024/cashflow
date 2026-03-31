@@ -1,60 +1,57 @@
 using CashFlow.Api.Application.Interfaces;
-using Mscc.GenerativeAI;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace CashFlow.Api.Application.Services;
 
 public class ReportService :IReportService
 {
-    private readonly string _apiKey;
-    public ReportService(IConfiguration configuration)
-
+    private readonly IGeminiClientFactory _gemini;
+    private readonly IDistributedCache _cache;
+    public ReportService(IGeminiClientFactory gemini,IDistributedCache cache)
     {
-        _apiKey= configuration["Gemini:ApiKey"]
-         ?? throw new InvalidOperationException("Gemini API key not configured.");
+        _gemini = gemini;
+        _cache= cache;
     }
 
     public async Task<string> GenerateReportNarrativeAsync(MonthlyReportData data)
     {
+        var cacheKey = $"report:{data.UserName}:{data.Year}:{data.Month}:" +
+                       $"{data.TotalIncome:F0}:{data.TotalSpending:F0}";
+
+        var cached = await _cache.GetStringAsync(cacheKey);
+        if (cached is not null)
+        {
+            Console.WriteLine($"CACHE HIT Report at {DateTime.UtcNow:HH:mm:ss}");
+            return cached;
+        }
+
+        Console.WriteLine($" CACHE MISS Report at {DateTime.UtcNow:HH:mm:ss}");
         try
         {
-            var googleAI = new GoogleAI(_apiKey);
-            var model= googleAI.GenerativeModel("gemini-2.5-flash");
+            var model = _gemini.CreateModel();
 
-            var categoryLines = string.Join("\n",data.Categories.Select(c=> 
-            $"- {c.Category}: ${c.Amount:F2} ({c.Percentage:F1}%)"));
+            var categoryLines = string.Join(",", data.Categories.Select(c =>
+            $"{c.Category}:${c.Amount:F0}({c.Percentage:F0}%)"));
 
-            var prompt = $"""
-                You are a professional financial advisor writing a monthly report.
-                Write a concise, insightful financial narrative (3-4 sentences max).
-
-                Client: {data.UserName}
-                Month: {data.MonthName} {data.Year}
-
-                Financial Summary:
-                - Total Income:    ${data.TotalIncome:F2}
-                - Total Spending:  ${data.TotalSpending:F2}
-                - Net Savings:     ${data.NetSavings:F2}
-                - Savings Rate:    {data.SavingsRate:F1}%
-                - Opening Balance: ${data.OpeningBalance:F2}
-                - Closing Balance: ${data.ClosingBalance:F2}
-
-                Spending by Category:
-                {categoryLines}
-
-                Rules:
-                - Professional but friendly tone
-                - Mention the biggest spending category
-                - Comment on savings rate (good if above 20%)
-                - Give one specific actionable recommendation
-                - Max 4 sentences
-                - No bullet points — flowing paragraph only
-                """;
+            var prompt =
+            $"Client:{data.UserName},{data.MonthName} {data.Year}. " +
+            $"Income:${data.TotalIncome:F0},Spend:${data.TotalSpending:F0}," +
+            $"Savings:${data.NetSavings:F0}({data.SavingsRate:F1}%)," +
+            $"OpenBal:${data.OpeningBalance:F0},CloseBal:${data.ClosingBalance:F0}." +
+            $"Categories:{categoryLines}.\n" +
+            "Write 3-4 sentence financial narrative paragraph. " +
+            "Mention biggest spending category. Comment savings rate (good if >20%). " +
+            "One actionable recommendation. Professional friendly tone. No bullets. No markdown.";
 
             var response= await model.GenerateContent(prompt);
             var narrative = response.Text?.Trim() ?? FallbackNarrative(data);
 
             Console.WriteLine($"AI Report Narrative generated");
+
+            await _cache.SetStringAsync(cacheKey,narrative,new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow= TimeSpan.FromHours(24)
+            });
             return narrative;
         }
         catch(Exception ex)

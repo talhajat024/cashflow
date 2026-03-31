@@ -1,30 +1,48 @@
 using CashFlow.Api.Application.Interfaces;
-using Mscc.GenerativeAI;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace CashFlow.Api.Application.Services;
 
 public class InsightService:IInsightService
 {
-    private readonly string _apiKey;
-    public InsightService(IConfiguration configuration)
+    private readonly IGeminiClientFactory _gemini;
+    private readonly IDistributedCache _cache;
+    public InsightService(IGeminiClientFactory gemini,IDistributedCache cache)
     {
-        _apiKey= configuration["Gemini:ApiKey"] ?? throw new InvalidOperationException("Gemini API key not configured");
+        _gemini=gemini;
+        _cache=cache;
     }
 
     public async Task<string> GenerateInsightAsync(SpendingInsightData data)
     {
+        var cacheKey= $"insight:{data.TotalIncomeThisMonth:F0}:{data.TotalSpendingThisMonth:F0}:" +
+                       $"{data.TotalIncomeLastMonth:F0}:{data.TotalSpendingLastMonth:F0}";
+        var cached= await _cache.GetStringAsync(cacheKey);
+        if(cached is not null)
+        {
+            Console.WriteLine($"CACHE HIT Insight at {DateTime.UtcNow:HH:mm:ss}");
+            return cached;
+        }
+
+        Console.WriteLine($" CACHE MISS Insight at {DateTime.UtcNow:HH:mm:ss}");
         try
         {
-            var googleAI = new GoogleAI(_apiKey);
-            var model = googleAI.GenerativeModel("gemini-2.5-flash");
+            var model = _gemini.CreateModel();
 
             var prompt = BuildPrompt(data);
             var response = await model.GenerateContent(prompt);
-
             var insight = response.Text?.Trim() ?? string.Empty;
 
+            if(string.IsNullOrEmpty(insight))
+                return FallbackInsight(data);
+
             Console.WriteLine($"AI Insight: {insight}");
-            return string.IsNullOrEmpty(insight) ? FallbackInsight(data):insight;
+            await _cache.SetStringAsync(cacheKey,insight,new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow=TimeSpan.FromHours(1)
+            });
+            return insight;
         }
         catch(Exception ex)
         {
@@ -35,36 +53,12 @@ public class InsightService:IInsightService
 
     public static string BuildPrompt(SpendingInsightData data)
     {
-        var thisMonth = string.Join(", ",data.ThisMonthCategories.Select(c=> $"{c.Category}: ${c.Amount:F0}"));
-        
-        var lastMonth = string.Join(", ", data.LastMonthCategories
-            .Select(c => $"{c.Category}: ${c.Amount:F0}"));
+        var thisMonth = string.Join(",", data.ThisMonthCategories.Select(c => $"{c.Category}:${c.Amount:F0}"));
+        var lastMonth = string.Join(",", data.LastMonthCategories.Select(c => $"{c.Category}:${c.Amount:F0}"));
 
-        return $"""
-            You are a personal finance advisor. Analyze this spending data and generate
-            ONE short, specific, actionable insight (max 12 words).
-            
-            This month:
-            - Total Income:   ${data.TotalIncomeThisMonth:F0}
-            - Total Spending: ${data.TotalSpendingThisMonth:F0}
-            - By category:    {thisMonth}
-            
-            Last month:
-            - Total Income:   ${data.TotalIncomeLastMonth:F0}
-            - Total Spending: ${data.TotalSpendingLastMonth:F0}
-            - By category:    {lastMonth}
-            
-            Rules:
-            - Return ONLY the insight text — no explanation, no prefix like "Insight:"
-            - Be specific with numbers or percentages when relevant
-            - Focus on the most notable change or pattern
-            - Keep it under 12 words
-            - Examples:
-              "You spent 40% more on Food this month"
-              "Great job! Spending down 15% vs last month"
-              "Entertainment costs increased by $50 this month"
-              "You're on track to save $500 this month"
-            """;
+        return $"ThisMonth:income${data.TotalIncomeThisMonth:F0},spend${data.TotalSpendingThisMonth:F0},[{thisMonth}]." +
+               $"LastMonth:income${data.TotalIncomeLastMonth:F0},spend${data.TotalSpendingLastMonth:F0},[{lastMonth}].\n" +
+               "Reply ONE insight sentence≤12words. No prefix. No explanation. No quotes.";
     }
 
     private static string FallbackInsight(SpendingInsightData data)
