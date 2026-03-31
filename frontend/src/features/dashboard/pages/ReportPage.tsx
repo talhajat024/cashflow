@@ -1,11 +1,31 @@
-import { Sparkles, TrendingUp, TrendingDown } from "lucide-react";
+import { Sparkles, Calendar, FileDown, Loader2 } from "lucide-react";
 import { useReport } from "../hooks/useReport";
 import { HealthScoreCard } from "../components/HealthScoreCard";
 import { BudgetRecommendations } from "../components/BudgetRecommendations";
-import { MonthlyReport } from "../components/MonthlyReport";
 import { IncomeVsExpenseChart } from "../components/IncomeVsExpenseChart/IncomeVsExpenseChart";
 import { SpendingByCategory } from "../components/SpendingByCategory/SpendingByCategory";
 import { PageSkeleton } from "../../../shared/ui/pageskeleton";
+import { ReportStatsRow } from "../components/ReportStatsRow";
+
+const MONTHS = [
+  { value: 1, label: "January" },
+  { value: 2, label: "February" },
+  { value: 3, label: "March" },
+  { value: 4, label: "April" },
+  { value: 5, label: "May" },
+  { value: 6, label: "June" },
+  { value: 7, label: "July" },
+  { value: 8, label: "August" },
+  { value: 9, label: "September" },
+  { value: 10, label: "October" },
+  { value: 11, label: "November" },
+  { value: 12, label: "December" },
+];
+
+const YEARS = Array.from({ length: 5 }, (_, i) => {
+  const year = new Date().getFullYear() - i;
+  return { value: year, label: String(year) };
+});
 
 export default function ReportPage() {
   const {
@@ -35,84 +55,81 @@ export default function ReportPage() {
 
   return (
     <div className="flex flex-col gap-6 pb-10">
-
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-[20px] font-semibold text-gray-900">Financial Report</h2>
-          <p className="text-sm text-gray-500 mt-1">Overview of your monthly income and spending</p>
+      {/*  Header  */}
+      <div className="flex items-center justify-between">
+        {/* Left */}
+        <div className="flex items-center gap-3">
+          <h2 className="text-[22px] font-bold text-gray-900">
+            Financial Report
+          </h2>
+          <span className="flex items-center gap-1.5 text-[12px] font-medium text-blue-500 bg-blue-50 px-3 py-1 rounded-full">
+            <Sparkles size={12} />
+            AI Powered
+          </span>
         </div>
 
-        <div>
-          <MonthlyReport
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-            onDownload={downloadReport}
-            downloading={downloading}
-          />
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          {/* Month/Year selector */}
+          <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-white cursor-pointer">
+            <Calendar size={14} className="text-gray-400" />
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              className="text-[13px] font-medium text-gray-700 outline-none bg-transparent cursor-pointer"
+            >
+              {MONTHS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="text-[13px] font-medium text-gray-700 outline-none bg-transparent cursor-pointer"
+            >
+              {YEARS.map((y) => (
+                <option key={y.value} value={y.value}>
+                  {y.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Download PDF button */}
+          <button
+            onClick={downloadReport}
+            disabled={downloading}
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {downloading ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <FileDown size={14} />
+            )}
+            Download PDF
+          </button>
         </div>
       </div>
 
-      {/* Top KPI row - 3 cards */}
-      <div className="grid grid-cols-3 gap-6">
-        {/* KPI 1: Health Score */}
-        <div className="bg-white rounded-xl p-5 shadow-[0_6px_20px_rgba(16,24,40,0.06)]">
-          {healthScore ? (
-            <HealthScoreCard data={healthScore} />
-          ) : (
-            <div className="h-28 flex items-center justify-center text-gray-400 text-sm">
-              Health score unavailable
-            </div>
-          )}
-        </div>
-
-        {/* KPI 2: Total Income */}
-        <div className="bg-white rounded-xl p-5 shadow-[0_6px_20px_rgba(16,24,40,0.06)]">
-          <div className="text-[13px] text-gray-500">Total Income</div>
-          <div className="flex items-center justify-between mt-2">
-            <div>
-              <div className="text-[20px] font-semibold text-gray-900">
-                ${reportStats?.totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "0.00"}
-              </div>
-              <div className="text-[12px] text-gray-400 mt-1">vs last month</div>
-            </div>
-            <div className={`flex items-center gap-1 text-sm font-medium ${
-              (reportStats?.incomeChangePercent ?? 0) >= 0 ? "text-green-500" : "text-red-500"
-            }`}>
-              {(reportStats?.incomeChangePercent ?? 0) >= 0 ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingDown size={16} />
-              )}
-              {Math.abs(reportStats?.incomeChangePercent ?? 0).toFixed(1)}%
-            </div>
+      <div className="grid grid-cols-3 gap-6 items-stretch">
+        {healthScore ? (
+          <HealthScoreCard data={healthScore} />
+        ) : (
+          <div className="h-28 flex items-center justify-center text-gray-400 text-sm">
+            Health score unavailable
           </div>
-        </div>
+        )}
 
-        {/* KPI 3: Total Spending */}
-        <div className="bg-white rounded-xl p-5 shadow-[0_6px_20px_rgba(16,24,40,0.06)]">
-          <div className="text-[13px] text-gray-500">Total Spending</div>
-          <div className="flex items-center justify-between mt-2">
-            <div>
-              <div className="text-[20px] font-semibold text-gray-900">
-                ${reportStats?.totalSpending.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "0.00"}
-              </div>
-              <div className="text-[12px] text-gray-400 mt-1">vs last month</div>
-            </div>
-            <div className={`flex items-center gap-1 text-sm font-medium ${
-              (reportStats?.spendingChangePercent ?? 0) <= 0 ? "text-green-500" : "text-red-500"
-            }`}>
-              {(reportStats?.spendingChangePercent ?? 0) <= 0 ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingDown size={16} />
-              )}
-              {Math.abs(reportStats?.spendingChangePercent ?? 0).toFixed(1)}%
-            </div>
+        {reportStats && (
+          <div className="col-span-2">
+            <ReportStatsRow
+              stats={reportStats}
+              chartData={incomeVsExpense ?? []}
+            />
           </div>
-        </div>
+        )}
       </div>
 
       {/* Income vs Spending chart */}
@@ -136,7 +153,9 @@ export default function ReportPage() {
         {/* Right: Spending by Category (4 cols) */}
         <div className="col-span-4">
           <div className="bg-white rounded-xl p-5 shadow-[0_6px_20px_rgba(16,24,40,0.06)] h-full">
-            <SpendingByCategory categories={transactionStats?.categories ?? []} />
+            <SpendingByCategory
+              categories={transactionStats?.categories ?? []}
+            />
           </div>
         </div>
       </div>
