@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { Card, CardContent } from "../../../../shared/ui";
 import type { TransactionCategory } from "../../types/report.types";
 
 interface SpendingByCategoryProps {
@@ -24,70 +25,74 @@ export function SpendingByCategory({ categories }: SpendingByCategoryProps) {
 
   if (!hasData) {
     return (
-      <div>
-        <h4 className="text-sm font-semibold text-gray-800 mb-4">Spending by Category</h4>
-        <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
-          No category data available
-        </div>
-      </div>
+      <Card className="h-full">
+        <CardContent className="p-5">
+          <h4 className="text-sm font-semibold text-gray-800 mb-4">Spending by Category</h4>
+          <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
+            No category data available
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div>
-      <h4 className="text-sm font-semibold text-gray-800 mb-4">Spending by Category</h4>
+    <Card className="h-full">
+      <CardContent className="p-5 flex flex-col h-full">
+        <h4 className="text-sm font-semibold text-gray-800 mb-4">Spending by Category</h4>
 
-      <div className="h-40 relative min-h-[160px]">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={35}
-              outerRadius={55}
-              paddingAngle={2}
-              dataKey="value"
-            >
-              {data.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value: number | string, name: string) => [
-                `$${Number(value).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
-                name,
-              ]}
-              contentStyle={{
-                borderRadius: 8,
-                fontSize: 12,
-                border: "none",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="mt-4 space-y-2">
-        {categories.map((category, index) => (
-          <div key={category.name} className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+        <div className="h-40 relative min-h-[160px]">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={35}
+                outerRadius={55}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {data.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value: number | string | undefined, name: string | undefined) => {
+                  if (value === undefined || name === undefined) return ["$0", ""];
+                  return [`$${Number(value).toLocaleString("en-US", { minimumFractionDigits: 2 })}`, name];
+                }}
+                contentStyle={{
+                  borderRadius: 8,
+                  fontSize: 12,
+                  border: "none",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                }}
               />
-              <span className="text-xs text-gray-600">{category.name}</span>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="mt-4 space-y-2 flex-1">
+          {categories.map((category, index) => (
+            <div key={category.name} className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                />
+                <span className="text-xs text-gray-600">{category.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-800">
+                  {category.percentage}%
+                </span>
+                <span className="text-xs text-gray-400">${category.amount}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-800">
-                {category.percentage}%
-              </span>
-              <span className="text-xs text-gray-400">${category.amount}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

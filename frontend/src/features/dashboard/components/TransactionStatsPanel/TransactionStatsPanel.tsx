@@ -1,5 +1,5 @@
 import { MoreHorizontal } from "lucide-react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { Card, CardContent } from "../../../../shared/ui";
 import type { TransactionStats } from "../../types/report.types";
 
 interface Props {
@@ -28,72 +28,8 @@ function MerchantAvatar({ name, color }: { name: string; color: string }) {
 
 export function TransactionStatsPanel({ data }: Props) {
   return (
-    <div className="flex flex-col gap-6">
-
-      {/* Transaction Statistics — Donut */}
-      <div className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-[15px] font-semibold text-gray-900">Transaction Statistics</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Category breakdown</p>
-          </div>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
-            <MoreHorizontal size={18} />
-          </button>
-        </div>
-
-        {/* Donut */}
-        <div className="flex justify-center my-2">
-          <div className="h-40 w-40">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data.categories}
-                  dataKey="amount"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={46}
-                  outerRadius={72}
-                  paddingAngle={2}
-                >
-                  {data.categories.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(v: number | undefined) => [fmt(v ?? 0)]}
-                  contentStyle={{
-                    borderRadius: 10,
-                    fontSize: 12,
-                    border: "none",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="space-y-2 mt-2">
-          {data.categories.map((cat, i) => (
-            <div key={cat.name} className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <span
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: COLORS[i % COLORS.length] }}
-                />
-                <span className="text-gray-600">{cat.name}</span>
-              </div>
-              <span className="font-medium text-gray-800">{cat.percentage}%</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Top Merchants */}
-      <div className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+    <Card className="h-full">
+      <CardContent className="p-5 flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[15px] font-semibold text-gray-900">Top Merchants</h3>
           <button className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -101,7 +37,7 @@ export function TransactionStatsPanel({ data }: Props) {
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1">
           {data.topMerchants.map((merchant, i) => (
             <div key={merchant.name} className="flex items-center gap-3">
               {merchant.logo ? (
@@ -128,8 +64,7 @@ export function TransactionStatsPanel({ data }: Props) {
             <p className="text-sm text-gray-400 text-center py-6">No merchant data yet</p>
           )}
         </div>
-      </div>
-
-    </div>
+      </CardContent>
+    </Card>
   );
 }

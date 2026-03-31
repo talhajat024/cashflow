@@ -6,6 +6,7 @@ import { IncomeVsExpenseChart } from "../components/IncomeVsExpenseChart/IncomeV
 import { SpendingByCategory } from "../components/SpendingByCategory/SpendingByCategory";
 import { PageSkeleton } from "../../../shared/ui/pageskeleton";
 import { ReportStatsRow } from "../components/ReportStatsRow";
+import { TransactionStatsPanel } from "../components/TransactionStatsPanel/TransactionStatsPanel";
 
 const MONTHS = [
   { value: 1, label: "January" },
@@ -56,7 +57,7 @@ export default function ReportPage() {
   return (
     <div className="flex flex-col gap-6 pb-10">
       {/*  Header  */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-20">
         {/* Left */}
         <div className="flex items-center gap-3">
           <h2 className="text-[22px] font-bold text-gray-900">
@@ -131,13 +132,20 @@ export default function ReportPage() {
           </div>
         )}
       </div>
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left: Income vs Expense Chart (8 cols) */}
+        <div className="col-span-8">
+          <IncomeVsExpenseChart data={incomeVsExpense} />
+        </div>
 
-      {/* Income vs Spending chart */}
-      <div className="bg-white rounded-xl p-6 shadow-[0_6px_20px_rgba(16,24,40,0.06)]">
-        <IncomeVsExpenseChart data={incomeVsExpense} />
+        {/* Right: Transaction Statistics (4 cols) */}
+        <div className="col-span-4">
+          <SpendingByCategory categories={transactionStats?.categories ?? []} />
+        </div>
       </div>
 
       {/* Bottom section - Budget Recommendations + Spending by Category */}
+      {/* Bottom section - Budget Recommendations + Transaction Stats in same row */}
       <div className="grid grid-cols-12 gap-6">
         {/* Left: Budget Recommendations (8 cols) */}
         <div className="col-span-8">
@@ -150,13 +158,15 @@ export default function ReportPage() {
           )}
         </div>
 
-        {/* Right: Spending by Category (4 cols) */}
+        {/* Right: Transaction Stats Panel (4 cols) */}
         <div className="col-span-4">
-          <div className="bg-white rounded-xl p-5 shadow-[0_6px_20px_rgba(16,24,40,0.06)] h-full">
-            <SpendingByCategory
-              categories={transactionStats?.categories ?? []}
-            />
-          </div>
+          {transactionStats ? (
+            <TransactionStatsPanel data={transactionStats} />
+          ) : (
+            <div className="bg-white rounded-xl p-6 shadow-[0_6px_20px_rgba(16,24,40,0.06)] text-gray-400">
+              Transaction statistics unavailable
+            </div>
+          )}
         </div>
       </div>
 
