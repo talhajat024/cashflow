@@ -47,7 +47,12 @@
     <Folder Include="Application\Dashboard\Queries\GetHealthScore\" />
     <Folder Include="Application\DTOs\Auth\" />
     <Folder Include="Application\DTOs\Dashboard\" />
+    <Folder Include="Application\DTOs\Invoices\" />
     <Folder Include="Application\DTOs\Wallets\" />
+    <Folder Include="Application\Invoices\Commands\CreateInvoice\" />
+    <Folder Include="Application\Invoices\Queries\" />
+    <Folder Include="Application\Invoices\Queries\GetInvoiceSummary\" />
+    <Folder Include="Application\Invoices\Queries\GetInvoices\" />
     <Folder Include="Application\Reports\" />
     <Folder Include="Application\Reports\Queries\" />
     <Folder Include="Application\Reports\Queries\GetIncomeVsExpense\" />
@@ -65,11 +70,9 @@
     <Folder Include="Controllers\" />
     <Folder Include="Domain\Entities\" />
     <Folder Include="Domain\Enums\" />
-    <Folder Include="Infrastructure\" />
     <Folder Include="Infrastructure\AI\" />
     <Folder Include="Infrastructure\Data\" />
     <Folder Include="Infrastructure\PDF\" />
-    <Folder Include="Infrastructure\Repositories\" />
   </ItemGroup>
 
 </Project>

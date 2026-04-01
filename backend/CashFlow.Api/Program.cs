@@ -28,6 +28,8 @@ builder.Services.AddDbContextFactory<AppDbContext>(options=>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
 //  Services 
 
