@@ -82,9 +82,6 @@ public class InvoiceRepository : IInvoiceRepository
         {
             TotalClients = clients.Count,
             TotalInvoices = invoices.Count,
-            PendingInvoices = invoices.Count(i => i.Status == InvoiceStatus.Pending),
-            PaidInvoices = invoices.Count(i => i.Status == InvoiceStatus.Paid),
-            TotalPendingAmount = invoices.Where(i => i.Status == InvoiceStatus.Pending).Sum(i => i.Amount),
             TotalPaidAmount = invoices.Where(i => i.Status == InvoiceStatus.Paid).Sum(i => i.Amount)
         };
     }

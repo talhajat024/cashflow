@@ -41,6 +41,11 @@
     <Folder Include="Application\Budget\" />
     <Folder Include="Application\Budget\Queries\" />
     <Folder Include="Application\Budget\Queries\GetBudgetRecommendations\" />
+    <Folder Include="Application\Clients\" />
+    <Folder Include="Application\Clients\Commands\" />
+    <Folder Include="Application\Clients\Commands\CreateClient\" />
+    <Folder Include="Application\Clients\Queries\" />
+    <Folder Include="Application\Clients\Queries\GetClients\" />
     <Folder Include="Application\Common\" />
     <Folder Include="Application\Dashboard\" />
     <Folder Include="Application\Dashboard\Queries\" />
