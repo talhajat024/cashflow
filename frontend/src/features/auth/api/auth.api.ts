@@ -7,6 +7,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
     try {
         const response = await httpClient.post<AuthResponse>('/auth/login', credentials);
         refreshCsrfToken(); 
+        console.log("the response of api is:",response);
         return response.data;
     } catch (error) {
         console.error('Login API error:', error);

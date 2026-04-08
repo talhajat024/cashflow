@@ -89,11 +89,6 @@ export function InvoiceTable({invoices,loading,onViewInvoice}:Props){
                       {invoice.status.toUpperCase()}
                     </Badge>
                   </td>
-                 <td className="px-6 py-4">
-                  <Badge intent={getBadgeIntent(invoice.status)}>
-                    {invoice.status.toUpperCase()}
-                  </Badge>
-                </td>
                  </tr>
               ))}
             </tbody>
