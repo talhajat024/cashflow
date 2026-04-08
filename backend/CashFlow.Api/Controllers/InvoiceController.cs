@@ -48,11 +48,13 @@ public class InvoiceController : ControllerBase
     [HttpGet("summary")]
     public async Task<IActionResult> GetSummary()
     {
+        Console.WriteLine("Inside the get summary method in invoice controller");
         var query = new GetInvoiceSummaryQuery 
         { 
             UserId = GetUserId()  // This returns Guid
         };
         var result = await _mediator.Send(query);
+        Console.WriteLine($"The result is:{result}");
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 

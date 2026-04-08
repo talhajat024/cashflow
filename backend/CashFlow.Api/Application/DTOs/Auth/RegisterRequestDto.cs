@@ -5,9 +5,14 @@ namespace CashFlow.Api.Application.DTOs.Auth;
 public class RegisterRequestDto
 {
     [Required]
-    [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
-    [MaxLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
-    public string Name { get; set; } = string.Empty;
+    [MinLength(2, ErrorMessage = "First name must be at least 2 characters")]
+    [MaxLength(100, ErrorMessage = "First name cannot exceed 100 characters")]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required]
+    [MinLength(2, ErrorMessage = "Last name must be at least 2 characters")]
+    [MaxLength(100, ErrorMessage = "Last name cannot exceed 100 characters")]
+    public string LastName { get; set; } = string.Empty;
 
     [Required]
     [EmailAddress(ErrorMessage = "Invalid email address")]
@@ -18,6 +23,6 @@ public class RegisterRequestDto
     public string Password { get; set; } = string.Empty;
 
     [Required]
+    [Compare("Password", ErrorMessage = "Password and confirmation password do not match")]
     public string ConfirmPassword { get; set; } = string.Empty;
-
 }

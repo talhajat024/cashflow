@@ -12,7 +12,8 @@ public static class DatabaseSeeder
         var testUser= new User
         {
             Id=SeedConstants.TestUserId,
-            Name="Test User",
+             FirstName = "Test",     
+             LastName = "User",      
             Email="test@cashflow.com",
             PasswordHash=BCrypt.Net.BCrypt.HashPassword("Test@123"),
             Role="User",

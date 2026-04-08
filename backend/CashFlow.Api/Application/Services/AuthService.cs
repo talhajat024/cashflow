@@ -92,7 +92,8 @@ public class AuthService:IAuthService
         var user= new User
         {
             Id=Guid.NewGuid(),
-            Name=dto.Name.Trim(),
+            FirstName = dto.FirstName.Trim(),  
+            LastName = dto.LastName.Trim(),    
             Email=dto.Email.ToLower().Trim(),
             PasswordHash=BCrypt.Net.BCrypt.HashPassword(dto.Password),
             CreatedAt=DateTime.UtcNow,
@@ -101,7 +102,7 @@ public class AuthService:IAuthService
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
 
-        _=Task.Run(()=> _emailService.SendWelcomeEmailAsync(user.Email,user.Name));
+        _=Task.Run(()=> _emailService.SendWelcomeEmailAsync(user.Email,user.FullName));
 
         // Return user
         return new AuthResponseDto
@@ -146,7 +147,8 @@ public class AuthService:IAuthService
     private static UserDto MapToUserDto(User user)=> new()
     {
         Id= user.Id,
-        Name= user.Name,
+        FirstName = user.FirstName,  
+        LastName = user.LastName,    
         Email=user.Email,
         Role= user.Role,
         Avatar= user.Avatar,

@@ -53,6 +53,7 @@
     <Folder Include="Application\DTOs\Auth\" />
     <Folder Include="Application\DTOs\Dashboard\" />
     <Folder Include="Application\DTOs\Invoices\" />
+    <Folder Include="Application\DTOs\Profile\" />
     <Folder Include="Application\DTOs\Wallets\" />
     <Folder Include="Application\Invoices\Commands\CreateInvoice\" />
     <Folder Include="Application\Invoices\Queries\" />
