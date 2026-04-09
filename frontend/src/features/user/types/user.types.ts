@@ -1,6 +1,8 @@
 export interface User
 {
     id:string;
+    firstName:string;
+    lastName:string;
     name:string;
     email:string;
     role:'user' | 'admin';
@@ -8,6 +10,18 @@ export interface User
     initials:string;
     createdAt?:string;
     lastLogin?:string;
+
+    // profile fields
+    phoneNumber?:string;
+    city?:string;
+    state?:string;
+    zipCode?:string;
+    country?:string;
+    fullAddress?:string;
+    currency?:string;
+    defaultPaymentMethod?:string;
+    allowApplePay?:boolean;
+    allowGooglePay?:boolean;
 }
 
 export interface UserMenuState

@@ -4,23 +4,7 @@ import { tokenStorage } from "../../../shared/utils/tokenStorage";
 import * as authApi from '../api/auth.api';
 import type { LoginCredentials, SignupData, AuthContextType } from "../types/auth.types";
 import type { User } from "../../user/types/user.types";
-
-const getInitials = (name: string): string => {
-    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
-};
-
-const transformUser = (data: any): User => {
-    return {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        role: data.role || 'user',
-        avatar: data.avatar,
-        initials: getInitials(data.name),
-        createdAt: data.createdAt || new Date().toISOString(),
-        lastLogin: data.lastLogin,
-    };
-};
+import { createUserFromApi } from "../../user/utils/userUtils";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -62,7 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 setError(null);
 
                 if (tokenStorage.hasTokens()) {
-                    console.log("CSRF token found - attempting to restore session...");
+                    console.log("Tokens found - attempting to restore session...");
 
                     const storedUser = tokenStorage.getUser();
                     if (storedUser) {
@@ -74,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                         console.log("Verifying session with backend...");
                         const userData = await authApi.getCurrentUser();
                         console.log("Session verified for:", userData.email);
-                        const appUser = transformUser(userData);
+                        const appUser = createUserFromApi(userData);
                         setUser(appUser);
                         tokenStorage.setUser(appUser); 
                     } catch (err) {
@@ -83,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                         setUser(null);
                     }
                 } else {
-                    console.log("No CSRF token found - user is not authenticated");
+                    console.log("No tokens found - user is not authenticated");
                 }
             } catch (err) {
                 console.error("Auth initialization error:", err);
@@ -107,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const response = await authApi.login(credentials);
             console.log("Login successful for:", response.user.email);
 
-            const appUser = transformUser(response.user);
+            const appUser = createUserFromApi(response.user);
             tokenStorage.setUser(appUser);
             setUser(appUser); 
             navigate('/dashboard/overview', { replace: true });
@@ -121,14 +105,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }, [navigate]);
 
-    // signup handler
+    // signup handler - Updated to use firstName and lastName
     const signup = useCallback(async (data: SignupData) => {
         try {
             setIsLoading(true);
             setError(null);
             console.log("Attempting signup for:", data.email);
 
-            const response = await authApi.signup(data);
+            const response = await authApi.signup({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            });
             console.log("Signup successful for:", response.user.email);
 
             navigate('/login', { replace: true });
@@ -172,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             console.log("Refreshing user data...");
             const userData = await authApi.getCurrentUser(); 
-            const appUser = transformUser(userData);
+            const appUser = createUserFromApi(userData);
             setUser(appUser);
             tokenStorage.setUser(appUser);
             console.log("User data refreshed for:", appUser.email);
