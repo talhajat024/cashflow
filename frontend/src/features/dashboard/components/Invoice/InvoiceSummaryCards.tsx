@@ -73,11 +73,11 @@ export function InvoiceSummaryCards({
             </div>
 
             {/* Value + Mini Chart in the same row */}
-            <div className="flex items-center justify-between">
-              <span className="text-[32px] font-bold text-gray-900">{card.value}</span>
-              <div className="w-[80px]">
-                <MiniChart data={card.chartData as [number, number, number]} />
-              </div>
+            <div className="flex items-end justify-between">
+              <span className="text-[32px] font-bold text-gray-900 leading-none">{card.value}</span>
+              <div className="w-[80px] h-[64px]">
+              <MiniChart data={card.chartData as [number, number, number]} />
+            </div>
             </div>
           </CardContent>
         </Card>
