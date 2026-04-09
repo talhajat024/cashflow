@@ -60,14 +60,9 @@ namespace CashFlow.Api.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.HasIndex("UserId", "Email")
                         .IsUnique();
@@ -124,9 +119,6 @@ namespace CashFlow.Api.Migrations
                     b.Property<Guid?>("TransactionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("DueDate");
@@ -135,8 +127,6 @@ namespace CashFlow.Api.Migrations
                         .IsUnique();
 
                     b.HasIndex("TransactionId");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("ClientId", "Status");
 
@@ -234,17 +224,12 @@ namespace CashFlow.Api.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("WalletId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ToWalletId");
-
-                    b.HasIndex("UserId1");
 
                     b.HasIndex("WalletId");
 
@@ -399,14 +384,9 @@ namespace CashFlow.Api.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Wallets");
                 });
@@ -414,14 +394,10 @@ namespace CashFlow.Api.Migrations
             modelBuilder.Entity("CashFlow.Api.Domain.Entities.Client", b =>
                 {
                     b.HasOne("CashFlow.Api.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Clients")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("CashFlow.Api.Domain.Entities.User", null)
-                        .WithMany("Clients")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
@@ -438,10 +414,6 @@ namespace CashFlow.Api.Migrations
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("CashFlow.Api.Domain.Entities.User", null)
-                        .WithMany("Invoices")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Client");
 
@@ -467,14 +439,10 @@ namespace CashFlow.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CashFlow.Api.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("CashFlow.Api.Domain.Entities.User", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("UserId1");
 
                     b.HasOne("CashFlow.Api.Domain.Entities.Wallet", "Wallet")
                         .WithMany("Transactions")
@@ -491,14 +459,10 @@ namespace CashFlow.Api.Migrations
             modelBuilder.Entity("CashFlow.Api.Domain.Entities.Wallet", b =>
                 {
                     b.HasOne("CashFlow.Api.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Wallets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("CashFlow.Api.Domain.Entities.User", null)
-                        .WithMany("Wallets")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
@@ -511,8 +475,6 @@ namespace CashFlow.Api.Migrations
             modelBuilder.Entity("CashFlow.Api.Domain.Entities.User", b =>
                 {
                     b.Navigation("Clients");
-
-                    b.Navigation("Invoices");
 
                     b.Navigation("RefreshTokens");
 

@@ -14,7 +14,8 @@ public class ClientRepository:IClientRepository
 
     public async Task<Client?> GetByIdAsync(int id,Guid userId)
     {
-        return await _context.Clients.Include(c=> c.Invoices).FirstOrDefaultAsync(c=> c.Id == id && c.UserId == userId);
+        return await _context.Clients
+        .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
     }
 
     public async Task<IEnumerable<Client>> GetByUserIdAsync(Guid userId)

@@ -79,7 +79,7 @@ public class AppDbContext:DbContext
             .HasColumnType("decimal(18,2)");
 
             entity.HasOne(w=> w.User)
-            .WithMany()
+            .WithMany(u => u.Wallets)
             .HasForeignKey(w=> w.UserId)
             .OnDelete(DeleteBehavior.Cascade);
         });
@@ -150,7 +150,7 @@ public class AppDbContext:DbContext
 
             // Transaction -> User (for fast queries)
             entity.HasOne(t=> t.User)
-            .WithMany()
+            .WithMany(u => u.Transactions) 
             .HasForeignKey(t=> t.UserId)
             .OnDelete(DeleteBehavior.NoAction);
 
@@ -187,7 +187,7 @@ public class AppDbContext:DbContext
             
         // Relationship with User - now Guid matches
         entity.HasOne(c => c.User)
-            .WithMany()
+            .WithMany(u => u.Clients) 
             .HasForeignKey(c => c.UserId)
             .OnDelete(DeleteBehavior.Cascade);
             

@@ -54,7 +54,6 @@ public class User
     // Navigation properties
     public virtual ICollection<RefreshToken> RefreshTokens {get;set;} = new List<RefreshToken>();
     public virtual ICollection<Wallet> Wallets {get;set;}=new List<Wallet>();
-    public virtual ICollection<Invoice> Invoices {get;set;} = new List<Invoice>();
     public virtual ICollection<Client> Clients {get;set;} = new List<Client>();
     public virtual ICollection<Transaction> Transactions {get;set;}= new List<Transaction>();
     
