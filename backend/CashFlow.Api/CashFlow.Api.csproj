@@ -15,6 +15,7 @@
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -53,6 +54,7 @@
     <Folder Include="Application\DTOs\Auth\" />
     <Folder Include="Application\DTOs\Dashboard\" />
     <Folder Include="Application\DTOs\Invoices\" />
+    <Folder Include="Application\DTOs\Notifications\" />
     <Folder Include="Application\DTOs\Profile\" />
     <Folder Include="Application\DTOs\Wallets\" />
     <Folder Include="Application\Invoices\Commands\CreateInvoice\" />
@@ -76,6 +78,7 @@
     <Folder Include="Controllers\" />
     <Folder Include="Domain\Entities\" />
     <Folder Include="Domain\Enums\" />
+    <Folder Include="Hubs\" />
     <Folder Include="Infrastructure\AI\" />
     <Folder Include="Infrastructure\Data\" />
     <Folder Include="Infrastructure\PDF\" />

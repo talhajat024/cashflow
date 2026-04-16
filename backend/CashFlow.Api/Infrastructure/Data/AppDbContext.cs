@@ -14,6 +14,7 @@ public class AppDbContext:DbContext
     public DbSet<Transaction> Transactions=> Set<Transaction>();
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -161,82 +162,82 @@ public class AppDbContext:DbContext
 
         });
 
-            modelBuilder.Entity<Client>(entity =>
-    {
-        entity.HasKey(c => c.Id);
-        
-        entity.Property(c => c.Name)
-            .IsRequired()
-            .HasMaxLength(200);
-            
-        entity.Property(c => c.Email)
-            .IsRequired()
-            .HasMaxLength(256);
-            
-        entity.Property(c => c.Company)
-            .HasMaxLength(200);
-            
-        entity.Property(c => c.Phone)
-            .HasMaxLength(50);
-            
-        entity.Property(c => c.Address)
-            .HasMaxLength(500);
-            
-        entity.Property(c => c.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-            
-        // Relationship with User - now Guid matches
-        entity.HasOne(c => c.User)
-            .WithMany(u => u.Clients) 
-            .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-            
-        // Indexes
-        entity.HasIndex(c => new { c.UserId, c.Email }).IsUnique();
-        entity.HasIndex(c => c.UserId);
-    });
+        modelBuilder.Entity<Client>(entity =>
+        {
+            entity.HasKey(c => c.Id);
 
-       // Invoice configuration
-    modelBuilder.Entity<Invoice>(entity =>
-    {
-        entity.HasKey(i => i.Id);
-        
-        entity.Property(i => i.InvoiceNumber)
-            .IsRequired()
-            .HasMaxLength(50);
-            
-        entity.Property(i => i.Amount)
-            .HasColumnType("decimal(18,2)");
-            
-        entity.Property(i => i.Status)
-            .HasConversion<int>()
-            .HasDefaultValue(InvoiceStatus.Draft);
-            
-        entity.Property(i => i.Description)
-            .HasMaxLength(500);
-            
-        entity.Property(i => i.PdfUrl)
-            .HasMaxLength(500);
-            
-        entity.Property(i => i.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-            
-        // Relationship with Client
-        entity.HasOne(i => i.Client)
-            .WithMany(c => c.Invoices)
-            .HasForeignKey(i => i.ClientId)
-            .OnDelete(DeleteBehavior.Restrict);
-            
-        // Relationship with Transaction - ensure type matches
-        entity.HasOne(i => i.Transaction)
-            .WithMany()
-            .HasForeignKey(i => i.TransactionId)
-            .OnDelete(DeleteBehavior.SetNull);
-            
-        // Indexes
-        entity.HasIndex(i => new { i.ClientId, i.Status });
-        entity.HasIndex(i => i.InvoiceNumber).IsUnique();
-        entity.HasIndex(i => i.DueDate);
-    });
-    }
+            entity.Property(c => c.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(c => c.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(c => c.Company)
+                .HasMaxLength(200);
+
+            entity.Property(c => c.Phone)
+                .HasMaxLength(50);
+
+            entity.Property(c => c.Address)
+                .HasMaxLength(500);
+
+            entity.Property(c => c.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Relationship with User - now Guid matches
+            entity.HasOne(c => c.User)
+                .WithMany(u => u.Clients) 
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes
+            entity.HasIndex(c => new { c.UserId, c.Email }).IsUnique();
+            entity.HasIndex(c => c.UserId);
+        });
+
+        // Invoice configuration
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.HasKey(i => i.Id);
+
+            entity.Property(i => i.InvoiceNumber)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(i => i.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            entity.Property(i => i.Status)
+                .HasConversion<int>()
+                .HasDefaultValue(InvoiceStatus.Draft);
+
+            entity.Property(i => i.Description)
+                .HasMaxLength(500);
+
+            entity.Property(i => i.PdfUrl)
+                .HasMaxLength(500);
+
+            entity.Property(i => i.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Relationship with Client
+            entity.HasOne(i => i.Client)
+                .WithMany(c => c.Invoices)
+                .HasForeignKey(i => i.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relationship with Transaction - ensure type matches
+            entity.HasOne(i => i.Transaction)
+                .WithMany()
+                .HasForeignKey(i => i.TransactionId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Indexes
+            entity.HasIndex(i => new { i.ClientId, i.Status });
+            entity.HasIndex(i => i.InvoiceNumber).IsUnique();
+            entity.HasIndex(i => i.DueDate);
+        });
+        }
 }

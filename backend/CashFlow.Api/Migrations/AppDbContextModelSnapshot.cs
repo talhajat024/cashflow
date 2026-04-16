@@ -133,6 +133,43 @@ namespace CashFlow.Api.Migrations
                     b.ToTable("Invoices");
                 });
 
+            modelBuilder.Entity("CashFlow.Api.Domain.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("CashFlow.Api.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -418,6 +455,17 @@ namespace CashFlow.Api.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("CashFlow.Api.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("CashFlow.Api.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CashFlow.Api.Domain.Entities.RefreshToken", b =>

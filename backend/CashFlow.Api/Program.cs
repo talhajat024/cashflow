@@ -9,6 +9,7 @@ using CashFlow.Api.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using CashFlow.Api.Hubs;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +46,9 @@ builder.Services.AddScoped<IInsightService, InsightService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IHealthScoreService, HealthScoreService>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing
@@ -118,6 +122,7 @@ app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<NotificationHub>("/notificationHub");
 app.MapControllers();
 
 //  Seed Database 
