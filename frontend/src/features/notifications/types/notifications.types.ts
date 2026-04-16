@@ -30,3 +30,9 @@ export interface NotificationGroup
     items:Notification[];
 }
 
+export interface WebSocketStatus {
+    isConnected: boolean;
+    isReconnecting: boolean;
+    lastError?: string;
+}
+
