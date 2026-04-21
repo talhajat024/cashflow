@@ -15,18 +15,18 @@ interface BackendNotification {
 
 export const notificationApi={
     getAll:async():Promise<Notification[]> => {
-        const response = await httpClient.get<BackendNotification[]>('/notifications');
+        const response = await httpClient.get<BackendNotification[]>('/notification');
         return response.data.map(transformBackendToFrontend);
     },
     getUnreadCount:async():Promise<number>=>{
-        const response = await httpClient.get<{unreadCount:number}>('/notifications/unread-count');
+        const response = await httpClient.get<{unreadCount:number}>('/notification/unread-count');
         return response.data.unreadCount;
     },
     markAsRead:async(id:string):Promise<void>=>{
-        await httpClient.put(`/notifications/${id}/read`);
+        await httpClient.put(`/notification/${id}/read`);
     },
     markAllAsRead:async():Promise<void>=>{
-        await httpClient.put('/notifications/mark-all-read');
+        await httpClient.put('/notification/mark-all-read');
     },
 };
 

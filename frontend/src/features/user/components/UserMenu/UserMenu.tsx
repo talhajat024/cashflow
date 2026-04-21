@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {  Settings, Bell, CreditCard, 
+import { UserCircle, Settings, Bell, CreditCard, 
   Landmark, BarChart3, HelpCircle, LogOut 
 } from 'lucide-react';
 import {styles} from './UserMenu.styles';
@@ -114,6 +114,11 @@ export const UserMenu=()=>{
 
                     
                     <div className={styles.menuSection()}>
+                        <MenuItem
+                            icon={<UserCircle size={16} />}
+                            label="My Profile"
+                            onClick={() => handleNavigation('/dashboard/profile')}
+                        />
                         <MenuItem
                         icon={<Settings size={16}/>}
                         label="Account Settings"
